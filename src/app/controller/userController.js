@@ -12,47 +12,49 @@ class UserController {
 
   async register(req, res) {
     let command = "";
-    const { username, password, name, birthday, gender, email, type } =
+    const { username, password, name, birthday, gender, email, phone, type } =
       req.body;
     try {
       SQLpool.getConnection((err, connection) => {
         if (err) throw err;
 
         //check duplicated email
-        command = `SELECT * FROM User WHERE email = ${"'" + email + "'"} OR ${
-          "'" + username + "'"
-        };`;
+
+        command = `SELECT * FROM User WHERE email = ${"'" + email + "'"};`;
         connection.query(command, (error, result) => {
           if (error) throw error;
-          if (!result.length) {
-            if (username === result.username) {
-              return res.status(409).send({
-                error: true,
-                msg: "This username is already in use!",
-              });
-            }
-
-            if (email === result.email) {
-              return res.status(409).send({
-                error: true,
-                msg: "This email is already in use!",
-              });
-            }
+          if (result.length) {
+            return res.status(409).send({
+              msg: "This email is already in use!",
+            });
           }
         });
+        //check duplicated username
+        command = `SELECT * FROM User WHERE username = ${"'" + username + "'"
+          };`;
 
+        command = `SELECT * FROM User WHERE email = ${"'" + email + "'"} OR ${"'" + username + "'"
+          };`;
+
+        connection.query(command, (error, result) => {
+          if (error) throw error;
+          if (result.length) {
+            return res.status(409).send({
+              msg: "This username is already in use!",
+            });
+          }
+        });
         // hash password
         bcrypt.hash(password, 10, (error, passwordHashed) => {
           if (error) throw error;
           if (err) {
             return res.status(500).send({
-              error: true,
               msg: err,
             });
           }
           // has hashed pw => add to database
           command =
-            "INSERT INTO `User` (`id`, `username`, `password`, `name`, `birthday`, `gender`, `email`, `type`, `create_time`, `update_time`) VALUES (NULL, '" +
+            "INSERT INTO `User` (`id`, `username`, `password`, `name`, `birthday`, `gender`, `email`,'phone', `type`, `create_time`, `update_time`) VALUES (NULL, '" +
             username +
             "', '" +
             passwordHashed +
@@ -65,18 +67,18 @@ class UserController {
             "', '" +
             email +
             "', '" +
+            phone +
+            "', '" +
             type +
             "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
           connection.query(command, (err, result) => {
             if (err) {
               return res.status(400).send({
-                error: true,
                 msg: err,
               });
             }
             console.log(result);
             return res.status(201).send({
-              error: false,
               msg: "The user has been registered with us!",
             });
           });
@@ -85,10 +87,6 @@ class UserController {
       });
     } catch (err) {
       console.log(err);
-      return res.send({
-        error: true,
-        msg: err,
-      });
     }
   }
   async login(req, res) {
@@ -98,14 +96,12 @@ class UserController {
       SQLpool.getConnection((err, connection) => {
         if (err) throw err;
 
-        command = `SELECT * FROM User WHERE username = ${
-          "'" + username + "'"
-        };`;
+        command = `SELECT * FROM User WHERE username = ${"'" + username + "'"
+          };`;
         connection.query(command, (error, result) => {
           if (error) throw error;
           if (!result.length) {
             return res.status(401).send({
-              error: true,
               msg: "Username is incorrect",
             });
           }
@@ -115,7 +111,6 @@ class UserController {
             // wrong password
             if (bErr) {
               return res.status(401).send({
-                error: true,
                 msg: "Password is incorrect!",
               });
             }
@@ -134,21 +129,11 @@ class UserController {
               });
 
               return res.status(200).send({
-                error: false,
                 msg: `${result[0].name} (${result[0].username}) logged in!`,
-                userID: result[0].id,
-                name: result[0].name,
-                sex: result[0].gender,
-                birthday: result[0].birthday,
-                email: result[0].email,
-                phone: result[0].phone,
-                avatar: result[0].avatar,
-                roles: result[0].type,
                 token,
               });
             }
             return res.status(401).send({
-              error: true,
               msg: "Username or password is incorrect!",
             });
           });
@@ -156,8 +141,8 @@ class UserController {
       });
     } catch (err) {
       res.status(500).json({
-        error: true,
-        msg: err,
+        success: false,
+        message: error.message,
       });
     }
   }
@@ -170,8 +155,8 @@ class UserController {
       // check if refresh token exists
       if (!refreshToken) {
         return res.status(400).json({
-          error: true,
-          msg: "Please Login first.",
+          success: false,
+          message: "Please Login first.",
         });
       }
 
@@ -180,22 +165,22 @@ class UserController {
         // Invalid
         if (error) {
           return res.status(400).json({
-            error: true,
-            msg: "Please Login first.",
+            success: false,
+            message: "Please Login first.",
           });
         }
 
         // Valid
         const accessToken = authService.createAccessToken({ id: user.id });
         res.status(200).json({
-          error: false,
+          success: true,
           accessToken,
         });
       });
     } catch (error) {
       res.status(400).json({
-        error: true,
-        msg: error.message,
+        success: false,
+        message: error.message,
       });
     }
   }
@@ -245,12 +230,11 @@ class UserController {
       var command = "SELECT * FROM `User` WHERE id =" + userID;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result.length);
+        //console.log(result.length);
         res.send(result);
       });
     } catch (err) {
       console.log(err);
-      return res.send({ error: true, msg: err });
     }
   }
 
@@ -269,12 +253,11 @@ class UserController {
         userID;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result);
+        console.log(result.length);
         res.send(result);
       });
     } catch (err) {
       console.log(err);
-      return res.send({ error: true, msg: err });
     }
   }
   async deleteUserByIDRequest(req, res) {
@@ -288,7 +271,6 @@ class UserController {
       });
     } catch (err) {
       console.log(err);
-      return res.send({ error: true, msg: err });
     }
   }
 }

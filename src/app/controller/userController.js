@@ -115,6 +115,10 @@ class UserController {
           }
 
           if (bResult) {
+            const d = new Date();
+            d.setDate(d.getDate() + 1);
+            console.log(d.toString());
+
             // create token
             const token = authService.createAccessToken({ id: result[0].id });
             // create refresh token
@@ -140,6 +144,7 @@ class UserController {
               avatar: result[0].avatar,
               roles: result[0].type,
               token,
+              expiredDay: d,
             });
           }
 
@@ -179,6 +184,7 @@ class UserController {
             msg: "Please Login first.",
           });
         }
+
 
         // Valid
         const accessToken = authService.createAccessToken({ id: user.id });
@@ -265,7 +271,18 @@ class UserController {
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);
-        res.send(result);
+        res.status(200).send({
+          error: false,
+          msg: `${result[0].name} (${result[0].username}) logged in!`,
+          userID: result[0].id,
+          name: result[0].name,
+          sex: result[0].gender,
+          birthday: result[0].birthday,
+          email: result[0].email,
+          phone: result[0].phone,
+          avatar: result[0].avatar,
+          roles: result[0].type,
+        });
       });
     } catch (err) {
       console.log(err);

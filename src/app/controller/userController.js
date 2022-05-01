@@ -273,15 +273,7 @@ class UserController {
         console.log(result);
         res.status(200).send({
           error: false,
-          msg: `${result[0].name} (${result[0].username}) logged in!`,
-          userID: result[0].id,
-          name: result[0].name,
-          sex: result[0].gender,
-          birthday: result[0].birthday,
-          email: result[0].email,
-          phone: result[0].phone,
-          avatar: result[0].avatar,
-          roles: result[0].type,
+          msg: `Update Success`,
         });
       });
     } catch (err) {

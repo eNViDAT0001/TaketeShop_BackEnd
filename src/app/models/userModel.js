@@ -32,6 +32,10 @@ const UserSchema = new Schema({
         required: true,
         trim: true,
     },
+    birthday: {
+        type: String,
+        required: true,
+    },
     age: {
         type: Number,
         required: true,

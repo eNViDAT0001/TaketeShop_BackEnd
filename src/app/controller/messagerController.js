@@ -1,8 +1,8 @@
-const chanelSchema = require('../models/chanelModel')
+const chanelSchema = require('../models/messagerModel')
 
-class ChanelCotroller {
+class MessagerCotroller {
         //Ham lay du lieu tu database
-    async getAllChanel(req, res, next) {
+    async getAllMessager(req, res, next) {
         try {
             const question = await questionSchema.find().populate({
                 path:'userId',
@@ -14,7 +14,7 @@ class ChanelCotroller {
             res.send({ message: err.message })
         }
     }
-    async addChanel(req, res) {
+    async addMessager(req, res) {
         const questions = await new questionSchema({
             productId: req.body.productId,
             userId: req.body.userId,
@@ -28,7 +28,7 @@ class ChanelCotroller {
         }
     }
 
-    async setChanel(req,res){
+    async setMessager(req,res){
         try{
             const _id = req.params.id;
             const updateField = await questionSchema.findByIdAndUpdate(_id,req.body)
@@ -40,7 +40,7 @@ class ChanelCotroller {
         }
     }
     
-    async deleteChanelFromId(req,res){
+    async deleteMessagerFromId(req,res){
         const _id = req.params.id
         try{
         const user = await questionSchema.findByIdAndDelete(_id)
@@ -51,7 +51,7 @@ class ChanelCotroller {
         }
     }
    
-    async getChanelByIdProduct(req, res, next) {
+    async getMessagerByIdProduct(req, res, next) {
         try {
             const _id = req.params.id;
             const findQuestion = await questionSchema.find({ "productId": _id }).populate({
@@ -65,7 +65,7 @@ class ChanelCotroller {
     }
 
     
-    async findChanelFromId(req,res){
+    async findMessagerFromId(req,res){
         const _id = req.params.id
         try{
         const question = await questionSchema.findById(_id)
@@ -76,4 +76,4 @@ class ChanelCotroller {
         }
     }
 }
-module.exports = new ChanelCotroller
+module.exports = new MessagerCotroller

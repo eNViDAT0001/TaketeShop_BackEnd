@@ -8,7 +8,7 @@ const messSchema = new mongoose.Schema({
         required: true
     },   
     userId:{
-        type: Int16Array,
+        type: Number,
         ref:'Users',
         required: true
     },   
@@ -16,7 +16,7 @@ const messSchema = new mongoose.Schema({
         type: Boolean,
         default : false,
         required: true
-    }
+    },
     createAt:{
         type:Date,
         default:Date.now,

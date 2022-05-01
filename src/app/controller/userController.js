@@ -12,7 +12,7 @@ class UserController {
 
   async register(req, res) {
     let command = "";
-    const { username, password, name, birthday, gender, email, type } =
+    const { username, password, name, birthday, gender, email, phone, type } =
       req.body;
     try {
       SQLpool.getConnection((err, connection) => {
@@ -52,7 +52,7 @@ class UserController {
           }
           // has hashed pw => add to database
           command =
-            "INSERT INTO `User` (`id`, `username`, `password`, `name`, `birthday`, `gender`, `email`, `type`, `create_time`, `update_time`) VALUES (NULL, '" +
+            "INSERT INTO `User` (`id`, `username`, `password`, `name`, `birthday`, `gender`, `email`, `type`, `phone`, `create_time`, `update_time`) VALUES (NULL, '" +
             username +
             "', '" +
             passwordHashed +
@@ -66,6 +66,8 @@ class UserController {
             email +
             "', '" +
             type +
+            "', '" +
+            phone +
             "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
           connection.query(command, (err, result) => {
             if (err) {

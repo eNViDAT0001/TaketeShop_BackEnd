@@ -54,7 +54,7 @@ class UserController {
           }
           // has hashed pw => add to database
           command =
-            "INSERT INTO `User` (`id`, `username`, `password`, `name`, `birthday`, `gender`, `email`,'phone', `type`, `create_time`, `update_time`) VALUES (NULL, '" +
+            "INSERT INTO `User` (`id`, `username`, `password`, `name`, `birthday`, `gender`, `email`, `type`, `phone`, `create_time`, `update_time`) VALUES (NULL, '" +
             username +
             "', '" +
             passwordHashed +
@@ -70,6 +70,8 @@ class UserController {
             phone +
             "', '" +
             type +
+            "', '" +
+            phone +
             "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
           connection.query(command, (err, result) => {
             if (err) {
@@ -92,50 +94,63 @@ class UserController {
   async login(req, res) {
     let command = "";
     const { username, password } = req.body;
+    command = `SELECT * FROM User WHERE username = ${"'" + username + "'"};`;
     try {
-      SQLpool.getConnection((err, connection) => {
+      SQLpool.execute(command, (err, result) => {
         if (err) throw err;
-
-        command = `SELECT * FROM User WHERE username = ${"'" + username + "'"
-          };`;
-        connection.query(command, (error, result) => {
-          if (error) throw error;
-          if (!result.length) {
+        if (!result.length) {
+          return res.status(401).send({
+            error: true,
+            msg: "Username is incorrect",
+          });
+        }
+        //check Password
+        bcrypt.compare(password, result[0]["password"], (bErr, bResult) => {
+          // wrong password
+          if (bErr) {
             return res.status(401).send({
-              msg: "Username is incorrect",
+              error: true,
+              msg: "Password encode Error!",
             });
           }
 
-          //check Password
-          bcrypt.compare(password, result[0]["password"], (bErr, bResult) => {
-            // wrong password
-            if (bErr) {
-              return res.status(401).send({
-                msg: "Password is incorrect!",
-              });
-            }
-            if (bResult) {
-              // create token
-              const token = authService.createAccessToken({ id: result[0].id });
-              // create refresh token
-              const refreshToken = authService.createRefreshToken({
-                id: result[0].id,
-              });
-              // save refresh token to cookie
-              res.cookie("refresh_token", refreshToken, {
-                httpOnly: true,
-                path: "/user/refresh_token",
-                maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
-              });
+          if (bResult) {
+            const d = new Date();
+            d.setDate(d.getDate() + 1);
+            console.log(d.toString());
 
-              return res.status(200).send({
-                msg: `${result[0].name} (${result[0].username}) logged in!`,
-                token,
-              });
-            }
-            return res.status(401).send({
-              msg: "Username or password is incorrect!",
+            // create token
+            const token = authService.createAccessToken({ id: result[0].id });
+            // create refresh token
+            const refreshToken = authService.createRefreshToken({
+              id: result[0].id,
             });
+            // save refresh token to cookie
+            res.cookie("refresh_token", refreshToken, {
+              httpOnly: true,
+              path: "/user/refresh_token",
+              maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
+            });
+
+            return res.status(200).send({
+              error: false,
+              msg: `${result[0].name} (${result[0].username}) logged in!`,
+              userID: result[0].id,
+              name: result[0].name,
+              sex: result[0].gender,
+              birthday: result[0].birthday,
+              email: result[0].email,
+              phone: result[0].phone,
+              avatar: result[0].avatar,
+              roles: result[0].type,
+              token,
+              expiredDay: d,
+            });
+          }
+
+          return res.status(401).send({
+            error: true,
+            msg: "Password is incorrect!",
           });
         });
       });
@@ -169,6 +184,7 @@ class UserController {
             message: "Please Login first.",
           });
         }
+
 
         // Valid
         const accessToken = authService.createAccessToken({ id: user.id });
@@ -253,8 +269,12 @@ class UserController {
         userID;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result.length);
-        res.send(result);
+        console.log(result);
+        res.status(200).send({
+          error: false,
+          msg: `Update Success`,
+        });
+
       });
     } catch (err) {
       console.log(err);

@@ -106,6 +106,12 @@ class UserController {
             msg: "Username is incorrect",
           });
         }
+        if (result[0].type === 'BANNED'){
+          return res.status(401).send({
+            error: true,
+            msg: `${result[0].username} has been banned from system`,
+          });
+        }
         //check Password
         bcrypt.compare(password, result[0]["password"], (bErr, bResult) => {
           // wrong password
@@ -119,7 +125,6 @@ class UserController {
           if (bResult) {
             const d = new Date();
             d.setDate(d.getDate() + 1);
-            console.log(d.toString());
 
             // create token
             const token = authService.createAccessToken({ id: result[0].id });

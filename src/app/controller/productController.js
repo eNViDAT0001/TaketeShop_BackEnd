@@ -74,22 +74,22 @@ class ProductController {
 
   async addProductWithoutImage(req, res) {
     try {
-      var {categoryID, userID, name, descriptions, price, quantity, unitID} = req.body;
+      var product = req.query;
       var command =
         "INSERT INTO `Product` (`id`, `category_id`, `user_id`, `name`, `descriptions`, `price`, `quantity`, `unid_id`, `discount_id`, `create_time`, `update_time`) VALUES (NULL, '" +
-        categoryID +
+        product.categoryID +
         "', '" +
-        userID +
+        product.userID +
         "', '" +
-        name +
+        product.name +
         "', '" +
-        descriptions +
+        product.descriptions +
         "', '" +
-        price +
+        product.price +
         "', '" +
-        quantity +
+        product.quantity +
         "', '" +
-        unitID +
+        product.unitID +
         "', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);";
 
       SQLpool.execute(command, (err, result, field) => {

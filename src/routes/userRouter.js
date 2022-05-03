@@ -8,6 +8,10 @@ router.get('/getAllUser',userController.getAllUser)
 
 router.get('/:id',userController.getUserByIDRequest)
 router.patch('/:id', userController.updateUserByIDRequest)
+
+router.get('/:id', verifyToken,userController.getUserByIDRequest)
+router.patch('/:id', verifyToken, userController.updateUserByIDRequest)
+router.patch('/password/:id', verifyToken, userController.updatePassByIDRequest)
 router.delete('/:id', userController.deleteUserByIDRequest)
 
 router.post('/register', signupValidation, userController.register)

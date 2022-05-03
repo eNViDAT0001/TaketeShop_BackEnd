@@ -44,6 +44,7 @@ class UserController {
             });
           }
         });
+       
         // hash password
         bcrypt.hash(password, 10, (error, passwordHashed) => {
           if (error) throw error;

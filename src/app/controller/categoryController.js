@@ -12,7 +12,6 @@ class CategoryController {
       var command = "SELECT * FROM Category;";
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result);
         res.send(result);
       });
     } catch (err) {

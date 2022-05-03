@@ -7,7 +7,8 @@ const verifyToken = (req, res, next) => {
     !req.headers.authorization.split(" ")[1]
   ) {
     return res.status(422).json({
-      message: "Please provide the token",
+      error: true,
+      msg: "Please provide the token",
     });
   }
 
@@ -21,12 +22,10 @@ const verifyToken = (req, res, next) => {
 
       if (!result.length)
         return res.send({
-          message: "Invalid Token",
+          error: true,
+          msg: "Invalid Token",
         });
 
-      res.send({
-        message: `Approve permission for ${result[0].name} (${result[0].username})!`,
-      });
       next();
     });
   } catch (error) {
@@ -42,7 +41,8 @@ const verifyTokenWithSHOPRoles = (req, res, next) => {
     !req.headers.authorization.split(" ")[1]
   ) {
     return res.status(422).json({
-      message: "Please provide the token",
+      error: true,
+      msg: "Please provide the token",
     });
   }
 
@@ -52,14 +52,14 @@ const verifyTokenWithSHOPRoles = (req, res, next) => {
     const command = "SELECT type FROM User where id = " + decoded.id;
     SQLpool.execute(command, (err, result, field) => {
       if (err) throw err;
-
       if (!result.length)
         return res.send({
-          message: "Invalid User",
+          error: true,
+          msg: "Invalid User",
         });
-      if (result[0].type !== 'SHOP'){
+      if (result[0].type !== "SHOP") {
         res.status(401);
-        return res.send('Not allowed, require a SHOP')
+        return res.send("Not allowed, require a SHOP");
       }
       next();
     });
@@ -76,7 +76,7 @@ const verifyTokenWithSTAFFRoles = (req, res, next) => {
     !req.headers.authorization.split(" ")[1]
   ) {
     return res.status(422).json({
-      message: "Please provide the token",
+      msg: "Please provide the token",
     });
   }
 
@@ -92,9 +92,9 @@ const verifyTokenWithSTAFFRoles = (req, res, next) => {
           message: "Invalid User",
         });
 
-      if (result[0].type !== 'SHOP' || result[0].type !== 'STAFF'){
+      if (result[0].type !== "SHOP" || result[0].type !== "STAFF") {
         res.status(401);
-        return res.send('Not allowed, require a STAFF or SHOP')
+        return res.send("Not allowed, require a STAFF or SHOP");
       }
       next();
     });
@@ -104,4 +104,8 @@ const verifyTokenWithSTAFFRoles = (req, res, next) => {
   }
 };
 
-module.exports = verifyToken;
+module.exports = {
+  verifyToken,
+  verifyTokenWithSHOPRoles,
+  verifyTokenWithSTAFFRoles,
+};

@@ -12,7 +12,6 @@ class ProductController {
       var command = "SELECT * FROM Product;";
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result);
         res.send(result);
       });
     } catch (err) {

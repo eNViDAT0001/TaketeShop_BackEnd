@@ -8,7 +8,7 @@ const chanelSchema = new mongoose.Schema({
         required: true
     },
     userId:{
-        type: Int16Array,
+        type: Number,
         ref:'Users',
         required: true
     },      

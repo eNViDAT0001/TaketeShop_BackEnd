@@ -279,7 +279,7 @@ class UserController {
     const field = req.query.field;
     const value = req.query.value;
     const userID = req.params.id;
-
+    console.log("uplad xong");
     try {
       var command =
         "UPDATE `User` SET `" +
@@ -304,10 +304,11 @@ class UserController {
 
   async updatePassByIDRequest(req, res) {
     let command = "";
+    const oldpass = req.query.oldpass;
+    const newpass = req.query.newpass;
     const userID = req.params.id;
-    const oldpass = req.params.oldpass;
-    const newpass = req.params.newpass;
 
+    //console.log(oldpass);
     command = "SELECT * FROM `User` WHERE id =" + userID;
     SQLpool.execute(command, (err, result, field) => {
       if (err) throw err;
@@ -321,27 +322,28 @@ class UserController {
         }
         // if oldpass = nowpass => upload newpass
         if (bResult) {
-          try {
-            command =
-              "UPDATE `User` SET `" +
-              'password' +
-              "` = '" +
-              newpass +
-              "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
-              userID;
-            SQLpool.execute(command, (err, result, field) => {
-              if (err) throw err;
-              console.log(result);
-              res.status(200).send({
-                error: false,
-                msg: `Update Success`,
+          bcrypt.hash(newpass, 10, (error, passwordHashed) => {
+            try {
+              command =
+                "UPDATE `User` SET `" +
+                'password' +
+                "` = '" +
+                passwordHashed +
+                "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
+                userID;
+              SQLpool.execute(command, (err, result, field) => {
+                if (err) throw err;
+                console.log(result);
+                res.status(200).send({
+                  error: false,
+                  msg: `Update Success`,
+                });
+
               });
-
-            });
-          } catch (err) {
-            console.log(err);
-          }
-
+            } catch (err) {
+              console.log(err);
+            }
+          });
         }
 
       });

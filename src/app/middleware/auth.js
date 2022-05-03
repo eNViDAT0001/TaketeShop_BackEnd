@@ -104,4 +104,4 @@ const verifyTokenWithSTAFFRoles = (req, res, next) => {
   }
 };
 
-module.exports = verifyToken;
+module.exports = {verifyToken,verifyTokenWithSHOPRoles ,verifyTokenWithSTAFFRoles};

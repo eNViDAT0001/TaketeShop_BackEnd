@@ -30,14 +30,18 @@ const UserSchema = new Schema({
     name: {
         type: String,
         required: true,
-        trim: true,
+        
     },
     birthday: {
+<<<<<<< Updated upstream
         type: String,
         required: true,
     },
     age: {
         type: Number,
+=======
+        type: Date,
+>>>>>>> Stashed changes
         required: true,
     },
     gender: {

@@ -6,7 +6,7 @@ const { userController } = require('../app/controller/index')
 
 router.get('/getAllUser',userController.getAllUser)
 
-router.get('/:id', verifyToken,userController.getUserByIDRequest)
+router.get('/:id', verifyToken, userController.getUserByIDRequest)
 router.patch('/:id', verifyToken, userController.updateUserByIDRequest)
 router.delete('/:id', userController.deleteUserByIDRequest)
 router.get('/admin/:id', verifyTokenWithSHOPRoles, userController.getUserByIDRequestADMIN)

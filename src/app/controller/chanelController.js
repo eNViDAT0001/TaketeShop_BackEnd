@@ -1,24 +1,22 @@
 const chanelSchema = require('../models/chanelModel')
 
 class ChanelCotroller {
-        //Ham lay du lieu tu database
-    async getAllChanel(req, res, next) {
-        try {
-            const question = await questionSchema.find().populate({
-                path:'userId',
-                select:'nameAccount'
-            },)
+    //Ham lay du lieu tu database
+    async getAllChanel(req, res) {
+        try {            
+            const question = await chanelSchema.find().populate()
             res.send(question)
+            console.log("get all chanel susscess")
         }
         catch (err) {
-            res.send({ message: err.message })
+            res.send('Error' + err)
         }
     }
+
+
     async addChanel(req, res) {
-        const questions = await new questionSchema({
-            productId: req.body.productId,
+        const questions = await new chanelSchema({
             userId: req.body.userId,
-            question: req.body.question,
         })
         try {
             const temp = await questions.save()
@@ -28,51 +26,24 @@ class ChanelCotroller {
         }
     }
 
-    async setChanel(req,res){
-        try{
-            const _id = req.params.id;
-            const updateField = await questionSchema.findByIdAndUpdate(_id,req.body)
-            res.send(updateField)
-        }
-        catch(err)
-        {
+    async deleteChanelFromUserId(req, res) {
+        const userId = req.params.userId
+        try {
+            const user = await chanelSchema.findOneAndDelete({userId: userId})
+            res.send(user)
+        } catch (err) {
             res.send('error' + err)
         }
-    }
-    
-    async deleteChanelFromId(req,res){
-        const _id = req.params.id
-        try{
-        const user = await questionSchema.findByIdAndDelete(_id)
-        res.send(user)
-        }catch(err)
-        {
-            throw new Error(err)
-        }
-    }
-   
-    async getChanelByIdProduct(req, res, next) {
-        try {
-            const _id = req.params.id;
-            const findQuestion = await questionSchema.find({ "productId": _id }).populate({
-                path: 'userId',
-                select: 'nameAccount'
-            })
-            res.send(findQuestion)
-        } catch (err) {
-            throw new Error(err)
-        }
-    }
+    }  
 
-    
-    async findChanelFromId(req,res){
-        const _id = req.params.id
-        try{
-        const question = await questionSchema.findById(_id)
-        res.send(question)
-        }catch(err)
-        {
-            throw new Error(err)
+
+    async findChanelFromUserId(req, res) {
+        const userId = req.params.userId
+        try {
+            const question = await chanelSchema.find({userId: userId})
+            res.send(question)
+        } catch (err) {
+            res.send('error' + err)
         }
     }
 }

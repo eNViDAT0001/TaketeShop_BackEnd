@@ -1,11 +1,13 @@
 const router = require("express").Router();
 const { chanelController } = require("../app/controller/index");
 
-router.get('/',chanelController.getAllChanel)
-router.get('/product/:id', chanelController.getChanelByIdProduct)
-router.get('/:id',chanelController.findChanelFromId)
+router.get('/',chanelController.getAllChanel)//http://localhost:5000/chanel/
+
+router.get('/:userId',chanelController.findChanelFromUserId)//http://localhost:5000/chanel/:userId
+
 router.post('/',chanelController.addChanel)
 
-router.patch('/:id',chanelController.setChanel)
+router.delete('/:userId',chanelController.deleteChanelFromUserId)
+
 
 module.exports = router;

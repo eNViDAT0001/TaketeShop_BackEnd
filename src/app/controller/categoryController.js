@@ -12,11 +12,12 @@ class CategoryController {
       var command = "SELECT * FROM Category;";
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        res.send(result);
       });
     } catch (err) {
-      console.log("Product Error");
-      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
 
@@ -26,11 +27,12 @@ class CategoryController {
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result.length);
-        res.send(result);
       });
     } catch (err) {
-      console.log("Product Error");
-      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
 
@@ -53,24 +55,31 @@ class CategoryController {
         res.send(result);
       });
     } catch (err) {
-      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
 
   async addCategory(req, res) {
     try {
-      var { name, image } = req.body;
+      var { name, image, discount, image } = req.body;
       var command =
         "INSERT INTO `Category` (`id`, `name`, `discount`, `image`, `create_time`, `update_time`) VALUES (NULL, '" +
         name +
-        "', '0', '" +
+        "', '" +
+        discount +
+        "', '" +
         image +
         "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);";
       if (!image) {
         command =
           "INSERT INTO `Category` (`id`, `name`, `discount`, `image`, `create_time`, `update_time`) VALUES (NULL, '" +
           name +
-          "', '0', 'https://www.englishclub.com/images/vocabulary/food/fish-seafood/fish-seafood.jpg', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);";
+          "', '" +
+          discount +
+          "', 'https://www.englishclub.com/images/vocabulary/food/fish-seafood/fish-seafood.jpg', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);";
       }
 
       SQLpool.execute(command, (err, result, field) => {
@@ -79,8 +88,10 @@ class CategoryController {
         res.send(result);
       });
     } catch (err) {
-      console.log("Add Category Error: ");
-      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
 }

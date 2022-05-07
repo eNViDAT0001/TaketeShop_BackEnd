@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 
 const messSchema = new mongoose.Schema({  
 
-    chanelId:{
-        type:String,    
+    chanelId:{       
+        type: String,    
         ref : 'Chanel',
         required: true
     },

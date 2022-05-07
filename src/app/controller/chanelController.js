@@ -14,9 +14,9 @@ class ChanelCotroller {
     }
 
 
-    async addChanel(req, res) {
+    async addChanel(req, res) {       
         const questions = await new chanelSchema({
-            userId: req.body.userId,
+            userId: req.params.userId,
         })
         try {
             const temp = await questions.save()

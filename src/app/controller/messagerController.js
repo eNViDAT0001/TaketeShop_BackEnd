@@ -2,7 +2,7 @@ const messagerSchema = require('../models/messagerModel')
 const chanelSchema = require('../models/chanelModel')
 class messagerController {
     //Ham lay du lieu tu database
-    async getAllMessager(req, res, next) {        
+    async getAllMessager(req, res, next) {
         try {
             const messages = await messagerSchema.find()
                 .populate()
@@ -10,12 +10,12 @@ class messagerController {
             console.log("get all messgager susscess")
         }
         catch (err) {
-             res.send('Error' + err)
+            res.send('Error' + err)
         }
     }
 
     async getAllMessagerFromChanelId(req, res) {
-        const chanelId = req.params.chanelId
+        const chanelId = req.params.chanelId;
         try {
             const messages = await messagerSchema.find({ chanelId: chanelId })
                 .populate()
@@ -31,30 +31,46 @@ class messagerController {
         const userId = req.params.userId
         try {
             const messages = await messagerSchema.find({ userId: userId })
-            .populate()
-            res.send(messages);       
-        
+                .populate()
+            res.send(messages);
+
         } catch (err) {
             res.send('Error' + err)
         }
     }
 
-    async addMessager(req, res) {             
-        const messages = await new messagerSchema({
+    async addMessager(req, res) {
+        const questions = await new messagerSchema({
             chanelId: req.body.chanelId,
             userId: req.body.userId,
             text: req.body.text,
             isStaff: req.body.isStaff,
-            createAt : req.body.createAt,
+           // createAt: req.body.createAt,
         })
         try {
-            const temp = await messages.save()
+            const temp = await questions.save()
             res.json(temp)
             console.log("add messgager from userId susscess")
         } catch (err) {
             res.send('Error' + err)
         }
     }
+    // async addMessager(req, res) {             
+    //     const messages = await new messagerSchema({
+    //         chanelId: req.body.chanelId,
+    //         userId: req.body.userId,
+    //         text: req.body.text,
+    //         isStaff: req.body.isStaff,
+    //         createAt : req.body.createAt,
+    //     })
+    //     try {
+    //         const temp = await messages.save()
+    //         res.json(temp)
+    //         console.log("add messgager from userId susscess")
+    //     } catch (err) {
+    //         res.send('Error' + err)
+    //     }
+    // }
 
     async deleteMessagerFromId(req, res) {
         const _id = req.params.id
@@ -66,7 +82,7 @@ class messagerController {
         }
     }
 
-    
+
 }
 module.exports = new messagerController
 

@@ -1,5 +1,6 @@
 const messagerSchema = require('../models/messagerModel')
 const chanelSchema = require('../models/chanelModel')
+//const count = require("./index");
 class messagerController {
     //Ham lay du lieu tu database
     async getAllMessager(req, res, next) {
@@ -7,6 +8,7 @@ class messagerController {
             const messages = await messagerSchema.find()
                 .populate()
             res.send(messages);
+            //count = 0;
             console.log("get all messgager susscess")
         }
         catch (err) {
@@ -14,14 +16,15 @@ class messagerController {
         }
     }
 
-    async getAllMessagerFromChanelId(req, res) {
+    async getMessagerFromChanelId(req, res) {
         const chanelId = req.params.chanelId;
         try {
             const messages = await messagerSchema.find({ chanelId: chanelId })
-                .populate()
-            res.send(messages);
-            console.log("get messgager from chanelId susscess")
+            //.populate()
 
+            res.send(messages);
+            console.log("get messagers: " + messages.length)
+            //count = count + 10;
         } catch (err) {
             res.send('Error' + err)
         }
@@ -40,20 +43,29 @@ class messagerController {
     }
 
     async addMessager(req, res) {
-        const questions = await new messagerSchema({
+        const messages = await new messagerSchema({
             chanelId: req.body.chanelId,
             userId: req.body.userId,
             text: req.body.text,
             isStaff: req.body.isStaff,
-           // createAt: req.body.createAt,
         })
         try {
-            const temp = await questions.save()
-            res.json(temp)
-            console.log("add messgager from userId susscess")
+            const temp = await messages.save();
+            //res.json(temp)    
+            console.log("add messgager from userId susscess");        
+            res.send(temp);
         } catch (err) {
             res.send('Error' + err)
         }
+        // try {
+        //     const temp = await messages.save();           
+
+        //     res.send(temp) ;     
+        //     console.log("add messgager from userId susscess");      
+
+        // } catch (err) {
+        //     res.send('Error' + err)
+        // }
     }
     // async addMessager(req, res) {             
     //     const messages = await new messagerSchema({
@@ -85,4 +97,3 @@ class messagerController {
 
 }
 module.exports = new messagerController
-

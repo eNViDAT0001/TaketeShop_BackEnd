@@ -1,11 +1,12 @@
 const chanelSchema = require('../models/chanelModel')
+//const count = require("./index");
 
 class ChanelCotroller {
     //Ham lay du lieu tu database
     async getAllChanel(req, res) {
         try {            
             const question = await chanelSchema.find().populate()
-            res.send(question)
+            res.send(question);
             console.log("get all chanel susscess")
         }
         catch (err) {
@@ -19,8 +20,9 @@ class ChanelCotroller {
             userId: req.params.userId,
         })
         try {
-            const temp = await questions.save()
-            res.json(temp)
+            const temp = await questions.save();
+            //res.json(temp)            
+            res.send(temp) ;  
         } catch (err) {
             res.send('Error' + err)
         }
@@ -38,10 +40,11 @@ class ChanelCotroller {
 
 
     async findChanelFromUserId(req, res) {
-        const userId = req.params.userId
+        const userId = req.params.userId;
+        //count = 0;
         try {
-            const question = await chanelSchema.find({userId: userId})
-            res.send(question)
+            const chanel = await chanelSchema.find({userId: userId})
+            res.send(chanel)            
         } catch (err) {
             res.send('error' + err)
         }

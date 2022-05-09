@@ -1,6 +1,8 @@
 const { authService } = require("../services");
 const { authValidation } = require("../validations");
 const SQLpool = require("../../database/connectSQL");
+const { setConvertSQL } = require("../../ulti/ulti");
+
 
 class CategoryController {
   index(req, res, next) {
@@ -37,17 +39,16 @@ class CategoryController {
   }
 
   async updateCategoryByIDRequest(req, res) {
-    const name = req.query.name;
-    const image = req.query.field;
     const categoryID = req.params.id;
-
+    const { name, discount, image } = req.body;
+    const setName = setConvertSQL(name, "name");
+    const setDiscount = setConvertSQL(discount, "discount");
+    const setImage = setConvertSQL(image, "image");
     try {
       var command =
-        "UPDATE `Product` SET `name` = '" +
-        name +
-        "', `image` = '" +
-        image +
-        "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
+        "UPDATE `Category` SET " +
+        `${setName}${setDiscount}${setImage}` +
+        " update_time = CURRENT_TIMESTAMP WHERE id = " +
         categoryID;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
@@ -64,23 +65,17 @@ class CategoryController {
 
   async addCategory(req, res) {
     try {
-      var { name, image, discount, image } = req.body;
+      var { name, image, discount} = req.body;
       var command =
         "INSERT INTO `Category` (`id`, `name`, `discount`, `image`, `create_time`, `update_time`) VALUES (NULL, '" +
         name +
         "', '" +
         discount +
         "', '" +
-        image +
-        "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);";
-      if (!image) {
-        command =
-          "INSERT INTO `Category` (`id`, `name`, `discount`, `image`, `create_time`, `update_time`) VALUES (NULL, '" +
-          name +
-          "', '" +
-          discount +
-          "', 'https://www.englishclub.com/images/vocabulary/food/fish-seafood/fish-seafood.jpg', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);";
-      }
+        (image
+          ? image
+          : "https://www.englishclub.com/images/vocabulary/food/fish-seafood/fish-seafood.jpg") +
+        "' , CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);";
 
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;

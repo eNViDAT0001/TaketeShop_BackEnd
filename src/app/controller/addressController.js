@@ -1,4 +1,6 @@
 const SQLpool = require("../../database/connectSQL");
+const { setConvertSQL } = require("../../ulti/ulti");
+
 class AddressController {
   index(req, res, next) {
     res.send("Address controller....");
@@ -20,10 +22,10 @@ class AddressController {
     }
   }
 
-  async getProductWithCategoryID(req, res) {
+  async getAddressWithUserID(req, res) {
     try {
       var command =
-        "SELECT * FROM `Product` WHERE category_id =" + req.query.categoryID;
+        "SELECT * FROM `Address` WHERE user_id =" + req.query.userID;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result.length);
@@ -37,35 +39,11 @@ class AddressController {
     }
   }
 
-  async updateAddressByIDRequest(req, res) {
-    const field = req.query.field;
-    const value = req.query.value;
-    const AddressID = req.params.id;
-
-    try {
-      var command =
-        "UPDATE `Address` SET `" +
-        field +
-        "` = '" +
-        value +
-        "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
-        AddressID;
-      SQLpool.execute(command, (err, result, field) => {
-        if (err) throw err;
-        console.log(result);
-      });
-    } catch (err) {
-      res.send({
-        error: true,
-        msg: err,
-      });
-    }
-  }
   async deleteAddressByIDRequest(req, res) {
-    const { AddressID } = req.body;
+    const id = req.params.id;
 
     try {
-      var command = "DELETE FROM Address WHERE `Address`.`id` = " + AddressID;
+      var command = "DELETE FROM Address WHERE `Address`.`id` = " + id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);

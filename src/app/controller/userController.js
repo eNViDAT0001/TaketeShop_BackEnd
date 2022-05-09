@@ -4,6 +4,7 @@ const { authService } = require("../services");
 const { authValidation } = require("../validations");
 const jwt = require("jsonwebtoken");
 const SQLpool = require("../../database/connectSQL");
+const { setConvertSQL } = require("../../ulti/ulti");
 
 class UserController {
   index(req, res, next) {
@@ -66,9 +67,9 @@ class UserController {
             if (error) throw error
 
             console.log(username + " has been registered with us!");
-            return res.status(201).send({
-              msg: "The user has been registered with us!",
-            });
+            // return res.status(201).send({
+            //   msg: "The user has been registered with us!",
+            // });
           });
         });
         connection.release();

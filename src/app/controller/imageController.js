@@ -1,4 +1,5 @@
 const SQLpool = require("../../database/connectSQL");
+const { setConvertSQL } = require("../../ulti/ulti");
 
 class ImageController {
   index(req, res, next) {
@@ -6,60 +7,57 @@ class ImageController {
   }
 
   async getAllImage(req, res) {
+    const type = req.query.type + Image;
     try {
-      var command = "SELECT * from Image";
+      var command = "SELECT * from " + type;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
       });
     } catch (err) {
-        console.log(err);
-        res.send({
-          error: true,
-          msg: err,
-        });
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
 
-  async getProductWithCategoryID(req, res) {
+  async getImageByID(req, res) {
+    const type = req.query.type + Image;
     try {
-      var command =
-        "SELECT * FROM `Product` WHERE category_id =" + req.query.categoryID;
+      var command = "SELECT * FROM " + type + " WHERE id =" + req.query.imageID;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result.length);
         res.send(result);
       });
     } catch (err) {
-        res.send({
-            error: true,
-            msg: err,
-          });
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
 
   async updateImageByIDRequest(req, res) {
-    const field = req.query.field;
-    const value = req.query.value;
-    const ImageID = req.params.id;
-
+    const id = req.params.id;
+    const { type, imageID, imagePath, objectID } = req.body;
+    const setTable = type + "Image";
+    const setID = setConvertSQL(imageID, "id");
+    const setPath = setConvertSQL(imagePath, "image_path");
+    const setObject = setConvertSQL(objectID, `${type}_id`);
     try {
-      var command =
-        "UPDATE `Image` SET `" +
-        field +
-        "` = '" +
-        value +
-        "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
-        ImageID;
+      var command = `UPDATE ${setTable} SET ${setID}${setPath}${setObject} WHERE id = ${id}`;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);
       });
     } catch (err) {
-        res.send({
-            error: true,
-            msg: err,
-          });
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
   async deleteImageByIDRequest(req, res) {
@@ -81,28 +79,27 @@ class ImageController {
   }
 
   async addImage(req, res) {
+    const { type, imagePath, objectID } = req.body;
+    const setTable = type + "Image";
     try {
-      var { title, discount, image, endTime } = req.body;
       var command =
-        "INSERT INTO `Image` (`id`, `title`, `discount`, `image`, `endTime`, `create_time`, `update_time`) VALUES (NULL, '" +
-        title +
+        "INSERT INTO `" +
+        setTable +
+        "` (`id`, `product_id`, `image_path`, `create_time`, `update_time`) VALUES (NULL, '" +
+        objectID +
         "', '" +
-        discount +
-        "', '" +
-        image +
-        "', '" +
-        endTime +
+        imagePath +
         "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log("Add Image Success");
       });
     } catch (err) {
-        console.log(err);
-        res.send({
-          error: true,
-          msg: err,
-        });
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
 }

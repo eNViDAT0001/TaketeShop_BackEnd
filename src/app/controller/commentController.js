@@ -1,5 +1,19 @@
 const SQLpool = require("../../database/connectSQL");
+const { setConvertSQL } = require("../../ulti/ulti");
 
+const GET_ALL_COMMENT_DETAIL = (field, value) =>
+  "SELECT " +
+  "`Comment`.`id`, " +
+  "`Comment`.`product_id`, " +
+  "`Comment`.`user_id`, " +
+  "`Comment`.`comment`, " +
+  "`Comment`.`rating`, " +
+  'GROUP_CONCAT(CONCAT("{id: ",CommentImage.id,""), CONCAT(", image: \'",CommentImage.image_path,"\'}")) as images, ' +
+  "`Comment`.`create_time`, " +
+  "`Comment`.`update_time` " +
+  "FROM `Comment` LEFT JOIN CommentImage ON `Comment`.`id` = CommentImage.comment_id " +
+  (field ? `WHERE Comment.${field}` + "=" + `'${value}'` : "") +
+  "GROUP BY `Comment`.id;";
 class CommentController {
   index(req, res, next) {
     res.send("Comment controller....");
@@ -7,7 +21,7 @@ class CommentController {
 
   async getAllComment(req, res) {
     try {
-      var command = "SELECT * from Comment";
+      var command = GET_ALL_COMMENT_DETAIL();
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
       });
@@ -20,13 +34,12 @@ class CommentController {
     }
   }
 
-  async getProductWithCategoryID(req, res) {
+  async getCommentWithProductID(req, res) {
     try {
-      var command =
-        "SELECT * FROM `Product` WHERE category_id =" + req.query.categoryID;
+      var command = GET_ALL_COMMENT_DETAIL("product_id", req.query.productID)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result.length);
+        res.send(result)
       });
     } catch (err) {
       res.send({
@@ -37,22 +50,22 @@ class CommentController {
   }
 
   async updateCommentByIDRequest(req, res) {
-    const field = req.query.field;
-    const value = req.query.value;
+    const { productID, userID, comment, rating } = req.body;
     const CommentID = req.params.id;
+    const setProductID = setConvertSQL(productID, "product_id");
+    const setUserID = setConvertSQL(userID, "user_id");
+    const setComment = setConvertSQL(comment, "comment");
+    const setRating = setConvertSQL(rating, "rating");
 
     try {
       var command =
-        "UPDATE `Comment` SET `" +
-        field +
-        "` = '" +
-        value +
-        "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
+        "UPDATE `Comment` SET " +
+        `${setProductID}${setUserID}${setComment}${setRating}` +
+        " update_time = CURRENT_TIMESTAMP WHERE id = " +
         CommentID;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);
-        res.send(result);
       });
     } catch (err) {
       res.send({

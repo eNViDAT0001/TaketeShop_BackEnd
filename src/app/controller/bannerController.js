@@ -1,5 +1,20 @@
 const SQLpool = require("../../database/connectSQL");
+const { setConvertSQL } = require("../../ulti/ulti");
 
+const GET_ALL_BANNER_DETAIL = (field, value) =>
+  "SELECT " +
+  "Banner.id, " +
+  "Banner.title, " +
+  "Banner.discount, " +
+  "Banner.image, " +
+  "Banner.endTime, " +
+  'GROUP_CONCAT(CONCAT("{id: ",Product.id,"}")) as productID, ' +
+  "Banner.create_time, Banner.update_time" +
+  "FROM `Product` " +
+  "JOIN `BannerDetail` ON `BannerDetail`.`product_id` = `Product`.`id` " +
+  "JOIN `Banner` ON `BannerDetail`.`banner_id` = `Banner`.`id` " +
+  (field ? `WHERE Comment.${field}` + "=" + `'${value}'` : "") +
+  "GROUP BY BannerDetail.banner_id;";
 class BannerController {
   index(req, res, next) {
     res.send("Banner controller....");
@@ -7,34 +22,33 @@ class BannerController {
 
   async getAllBanner(req, res) {
     try {
-      var command = "SELECT * from Banner";
+      var command = GET_ALL_BANNER_DETAIL();
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
       });
     } catch (err) {
-        console.log(err);
-        res.send({
-          error: true,
-          msg: err,
-        });
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
 
-  async getProductWithCategoryID(req, res) {
+  async getProductIDWithBannerID(req, res) {
     try {
-      var command =
-        "SELECT * FROM `Product` WHERE category_id =" + req.query.categoryID;
+      var command = GET_ALL_BANNER_DETAIL("id", req.params.id);
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result.length);
         res.send(result);
       });
     } catch (err) {
-        res.send({
-            error: true,
-            msg: err,
-          });
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
 
@@ -56,17 +70,17 @@ class BannerController {
         console.log(result);
       });
     } catch (err) {
-        res.send({
-            error: true,
-            msg: err,
-          });
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
   async deleteBannerByIDRequest(req, res) {
-    const { bannerID } = req.body;
+    const id = req.params.id;
 
     try {
-      var command = "DELETE FROM Banner WHERE `Banner`.`id` = " + bannerID;
+      var command = "DELETE FROM Banner WHERE `Banner`.`id` = " + id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);
@@ -89,7 +103,9 @@ class BannerController {
         "', '" +
         discount +
         "', '" +
-        image +
+        (image
+          ? image
+          : "https://www.englishclub.com/images/vocabulary/food/fish-seafood/fish-seafood.jpg") +
         "', '" +
         endTime +
         "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
@@ -98,11 +114,11 @@ class BannerController {
         console.log("Add Banner Success");
       });
     } catch (err) {
-        console.log(err);
-        res.send({
-          error: true,
-          msg: err,
-        });
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
     }
   }
 }

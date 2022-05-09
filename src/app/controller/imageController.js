@@ -61,10 +61,11 @@ class ImageController {
     }
   }
   async deleteImageByIDRequest(req, res) {
-    const { ImageID } = req.body;
+    const setTable = req.query.type + "Image";
 
     try {
-      var command = "DELETE FROM Image WHERE `Image`.`id` = " + ImageID;
+      var command =
+        "DELETE FROM Image WHERE `" + setTable + "`.`id` = " + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);

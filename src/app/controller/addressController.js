@@ -25,7 +25,7 @@ class AddressController {
   async getAddressWithUserID(req, res) {
     try {
       var command =
-        "SELECT * FROM `Address` WHERE user_id =" + req.query.userID;
+        "SELECT * FROM `Address` WHERE user_id =" + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);

@@ -53,18 +53,17 @@ class BannerController {
   }
 
   async updateBannerByIDRequest(req, res) {
-    const field = req.query.field;
-    const value = req.query.value;
-    const bannerID = req.params.id;
+    const { title, discount, image} = req.body;
+    const setTitle = setConvertSQL(title, "title");
+    const setDiscount = setConvertSQL(discount, "discount");
+    const setImage = setConvertSQL(image, "image");
 
     try {
       var command =
-        "UPDATE `Banner` SET `" +
-        field +
-        "` = '" +
-        value +
-        "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
-        bannerID;
+        "UPDATE `Banner` SET " +
+        `${setTitle}${setDiscount}${setImage}` +
+        " update_time = CURRENT_TIMESTAMP WHERE id = " +
+        req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);

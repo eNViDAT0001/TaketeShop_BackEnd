@@ -40,7 +40,6 @@ class ProductController {
   async getAllProduct(req, res) {
     try {
       var command = GET_ALL_PRODUCT_DETAIL();
-      console.log(command)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -103,9 +102,8 @@ class ProductController {
     }
   }
   async deleteProductByID(req, res) {
-    const {id} = req.body;
     try {
-      var command = "DELETE FROM `Product` WHERE Product.id =" + id;
+      var command = "DELETE FROM `Product` WHERE Product.id =" + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);

@@ -37,7 +37,7 @@ class CommentController {
 
   async getCommentWithProductID(req, res) {
     try {
-      var command = GET_ALL_COMMENT_DETAIL("product_id", req.query.productID)
+      var command = GET_ALL_COMMENT_DETAIL("product_id", req.params.id)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result)
@@ -76,10 +76,9 @@ class CommentController {
     }
   }
   async deleteCommentByIDRequest(req, res) {
-    const { CommentID } = req.body;
 
     try {
-      var command = "DELETE FROM Comment WHERE `Comment`.`id` = " + CommentID;
+      var command = "DELETE FROM Comment WHERE `Comment`.`id` = " + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);

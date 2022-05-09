@@ -3,7 +3,6 @@ const { authValidation } = require("../validations");
 const SQLpool = require("../../database/connectSQL");
 const { setConvertSQL } = require("../../ulti/ulti");
 
-
 class CategoryController {
   index(req, res, next) {
     res.send("Category controller....");
@@ -66,7 +65,7 @@ class CategoryController {
 
   async addCategory(req, res) {
     try {
-      var { name, image, discount} = req.body;
+      var { name, image, discount } = req.body;
       var command =
         "INSERT INTO `Category` (`id`, `name`, `discount`, `image`, `create_time`, `update_time`) VALUES (NULL, '" +
         name +
@@ -84,6 +83,23 @@ class CategoryController {
         res.send(result);
       });
     } catch (err) {
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
+  async deleteCategoryByIDRequest(req, res) {
+    const id = req.params.id;
+
+    try {
+      var command = "DELETE FROM Category WHERE `Category`.`id` = " + id;
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        console.log(result);
+      });
+    } catch (err) {
+      console.log(err);
       res.send({
         error: true,
         msg: err,

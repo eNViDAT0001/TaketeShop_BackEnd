@@ -117,7 +117,7 @@ class CartController {
     }
   }
   async deleteCartByIDRequest(req, res) {
-    const { CartID } = req.body;
+    const  CartID  = req.params.id;
 
     try {
       var command = "DELETE FROM Cart WHERE `Cart`.`id` = " + CartID;
@@ -134,11 +134,10 @@ class CartController {
     }
   }
   async deleteCartItemsByIDRequest(req, res) {
-    const { CartItemID } = req.body;
 
     try {
       var command =
-        "DELETE FROM CartItem WHERE `CartItem`.`id` = " + CartItemID;
+        "DELETE FROM CartItem WHERE `CartItem`.`id` = " + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);

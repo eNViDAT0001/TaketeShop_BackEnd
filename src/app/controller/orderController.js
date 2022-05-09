@@ -55,7 +55,7 @@ class OrderController {
 
   async getOrderWithUserID(req, res) {
     try {
-      var command = "SELECT * FROM `Order` WHERE user_id =" + req.query.userID;
+      var command = "SELECT * FROM `Order` WHERE user_id =" + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -77,7 +77,7 @@ class OrderController {
         "JOIN `Order` ON `OrderItems`.`order_id` = `Order`.`id` " +
         "JOIN `User` ON `Order`.`user_id` = `User`.`id` " +
         "WHERE User.id = " +
-        req.query.userID;
+        req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -173,10 +173,9 @@ class OrderController {
     }
   }
   async deleteOrderByIDRequest(req, res) {
-    const { OrderID } = req.body;
 
     try {
-      var command = "DELETE FROM Order WHERE `Order`.`id` = " + OrderID;
+      var command = "DELETE FROM Order WHERE `Order`.`id` = " + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);

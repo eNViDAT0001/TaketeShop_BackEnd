@@ -14,6 +14,7 @@ class CategoryController {
       var command = "SELECT * FROM Category;";
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
+        res.send(result);
       });
     } catch (err) {
       res.send({
@@ -28,7 +29,7 @@ class CategoryController {
       var command = "SELECT * FROM `Category` WHERE id =" + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result.length);
+        res.send(result);
       });
     } catch (err) {
       res.send({

@@ -24,6 +24,7 @@ class CommentController {
       var command = GET_ALL_COMMENT_DETAIL();
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
+        res.send(result)
       });
     } catch (err) {
       console.log(err);

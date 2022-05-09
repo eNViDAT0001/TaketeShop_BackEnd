@@ -277,18 +277,29 @@ class UserController {
   }
 
   async updateUserByIDRequest(req, res) {
-    const field = req.query.field;
-    const value = req.query.value;
     const userID = req.params.id;
+    const {username, name, password, birthday, gender, email, phone, type, avatar} = req.body;
+    const setUsername = setConvertSQL(username, "username");
+    const setName = setConvertSQL(name, "name");
+    const setGender = setConvertSQL(gender, "gender");
+    const setPhone = setConvertSQL(phone, "phone");
+    const setBirthday = setConvertSQL(birthday, "birthday");
+    const setEmail = setConvertSQL(email, "email");
+    const setType = setConvertSQL(type, "type");
+    const setAvatar = setConvertSQL(avatar, "avatar");
+    const hashedPassword = (pass) => 
+      bcrypt.hash(pass, 10, (error, passwordHashed) => {
+        if (error) throw error;
+        return passwordHashed;
+      })
+    const setPassword = setConvertSQL(hashedPassword(password),"password")
 
     try {
       var command =
-        "UPDATE `User` SET `" +
-        field +
-        "` = '" +
-        value +
-        "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
-        userID;
+      "UPDATE `Order` SET " +
+      `${setUsername}${setPassword}${setName}${setGender}${setPhone}${setBirthday}${setEmail}${setType}${setAvatar}` +
+      " update_time = CURRENT_TIMESTAMP WHERE id = " +
+      userID;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);

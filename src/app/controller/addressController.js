@@ -28,7 +28,6 @@ class AddressController {
         "SELECT * FROM `Address` WHERE user_id =" + req.query.userID;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result.length);
         res.send(result);
       });
     } catch (err) {

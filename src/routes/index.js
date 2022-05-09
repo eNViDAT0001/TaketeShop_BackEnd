@@ -7,6 +7,8 @@ const cartRouter = require('./cartRouter')
 const commentRouter = require('./commentRouter')
 const imageRouter = require('./imageRouter')
 const orderRouter = require('./orderRouter')
+const messageRouter = require('./messageRouter')
+const chanelRouter = require('./chanelRouter')  
 function route(app) {
     app.use('/user', userRoute)
     app.use('/product', productRoute)
@@ -16,6 +18,7 @@ function route(app) {
     app.use('/comment', commentRouter)
     app.use('/image', imageRouter)
     app.use('/order', orderRouter)
+    app.use('/chanel',chanelRouter)
+    app.use('/message',messageRouter)
 }
-
 module.exports = route;

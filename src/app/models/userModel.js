@@ -30,10 +30,15 @@ const UserSchema = new Schema({
     name: {
         type: String,
         required: true,
-        trim: true,
+
+    },
+    birthday: {
+        type: String,
+        required: true,
     },
     age: {
         type: Number,
+        type: Date,
         required: true,
     },
     gender: {
@@ -46,17 +51,17 @@ const UserSchema = new Schema({
     },
     type: {
         type: String,
-        enum: ['SHOP','STAFF','CUSTOMER','BANNED'],
+        enum: ['SHOP', 'STAFF', 'CUSTOMER', 'BANNED'],
         default: 'CUSTOMER'
     },
-     createAt:{
-        type:Date,
-        default:Date.now,
+    createAt: {
+        type: Date,
+        default: Date.now,
         required: true
     },
 },
-//  {
-//     timestamps: true,}
+    //  {
+    //     timestamps: true,}
 )
 
 module.exports = mongoose.model('Users', UserSchema)

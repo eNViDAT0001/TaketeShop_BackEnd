@@ -38,9 +38,8 @@ class UserController {
                 msg: "This email is already in use!",
               });
             }
-            
           }
-        });
+        })
         // hash password
         bcrypt.hash(password, 10, (error, passwordHashed) => {
           if (error) throw error;
@@ -64,12 +63,13 @@ class UserController {
             type +
             "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
           connection.query(command, (error, result) => {
-            if (error) throw error
+            if (error) throw error;
 
             console.log(username + " has been registered with us!");
-            // return res.status(201).send({
-            //   msg: "The user has been registered with us!",
-            // });
+
+            return res.status(201).send({
+              msg: "The user has been registered with us!",
+            });
           });
         });
         connection.release();
@@ -294,6 +294,7 @@ class UserController {
       })
     const setPassword = setConvertSQL(hashedPassword(password),"password")
 
+
     try {
       var command =
       "UPDATE `Order` SET " +
@@ -313,6 +314,57 @@ class UserController {
       console.log(err);
     }
   }
+
+  async updatePassByIDRequest(req, res) {
+    let command = "";
+    const oldpass = req.query.oldpass;
+    const newpass = req.query.newpass;
+    const userID = req.params.id;
+
+    //console.log(oldpass);
+    command = "SELECT * FROM `User` WHERE id =" + userID;
+    SQLpool.execute(command, (err, result, field) => {
+      if (err) throw err;
+
+      // check oldpass == nowpass
+      bcrypt.compare(oldpass, result[0]["password"], (bErr, bResult) => {
+        console.log("oldpass = nowpass")
+        // wrong password
+        if (bErr) {
+          console.log("check oldpass error");
+        }
+        // if oldpass = nowpass => upload newpass
+        if (bResult) {
+          bcrypt.hash(newpass, 10, (error, passwordHashed) => {
+            try {
+              command =
+                "UPDATE `User` SET `" +
+                'password' +
+                "` = '" +
+                passwordHashed +
+                "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
+                userID;
+              SQLpool.execute(command, (err, result, field) => {
+                if (err) throw err;
+                console.log(result);
+                res.status(200).send({
+                  error: false,
+                  msg: `Update Success`,
+                });
+
+              });
+            } catch (err) {
+              console.log(err);
+            }
+          });
+        }
+
+      });
+
+    });
+
+  }
+
   async deleteUserByIDRequest(req, res) {
     const userID = req.params.id;
     try {

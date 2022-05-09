@@ -8,8 +8,10 @@ const cartController = require('./cartController')
 const commentController = require('./commentController')
 const imageController = require('./imageController')
 const orderController = require('./orderController')
+const messagerController = require('./messagerController')
 
 
+//var count = 0;
 module.exports ={
     userController,
     productController,
@@ -21,4 +23,5 @@ module.exports ={
     commentController,
     imageController,
     orderController,
+    messagerController,
 }

@@ -1,27 +1,29 @@
-const mongoose = require('mongoose')
-const chanelSchema = require('./chanelModel')
-const userSchema = require('./userModel.js')
+const mongoose = require('mongoose');
 
-const messSchema = new mongoose.Schema({
-    messId:{
-        type: mongoose.Schema.Types.ObjectId,       
+
+const messSchema = new mongoose.Schema({  
+
+    chanelId:{       
+        type: String,    
+        ref : 'Chanel',
         required: true
-    },   
+    },
     userId:{
-        type: Int16Array,
-        ref:'Users',
+        type: Number,        
         required: true
-    },   
+    },  
+    text : {
+        type: String,      
+        default: null
+    },
     isStaff:{
-        type: Boolean,
-        default : false,
-        required: true
-    }
+        type: Boolean,       
+        default: false
+    },
     createAt:{
         type:Date,
-        default:Date.now,
-        required: true
+        default:Date.now,       
     },
 })
 
-module.exports = mongoose.model('Message',chanelSchema);
+module.exports = mongoose.model('Message',messSchema);

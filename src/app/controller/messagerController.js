@@ -18,6 +18,8 @@ class messagerController {
 
     async getMessagerFromChanelId(req, res) {
         const chanelId = req.params.chanelId;
+        //var socket = req.app.get('socketIO');
+        //socket.emit('hello');
         try {
             const messages = await messagerSchema.find({ chanelId: chanelId })
             //.populate()
@@ -52,7 +54,9 @@ class messagerController {
         try {
             const temp = await messages.save();
             //res.json(temp)    
-            console.log("add messgager from userId susscess");        
+            console.log("add messgager from userId susscess");  
+           // io.in('/add/:chanelId').emit(req.body);
+            //io.emit('temp', req.body);    
             res.send(temp);
         } catch (err) {
             res.send('Error' + err)

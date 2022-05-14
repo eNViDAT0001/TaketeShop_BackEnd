@@ -19,27 +19,28 @@ class UserController {
       SQLpool.getConnection((err, connection) => {
         if (err) throw err;
         //check duplicated username and email
-        command = `SELECT * FROM User WHERE email = ${"'" + email + "'"} OR ${"'" + username + "'"
-          };`;
+        command = `SELECT * FROM User WHERE email = ${"'" + email + "'"} OR ${
+          "'" + username + "'"
+        };`;
 
         connection.query(command, (error, result) => {
           if (error) throw error;
           if (result.length) {
-            if(result[0].username === username){
+            if (result[0].username === username) {
               return res.status(409).send({
                 error: true,
                 msg: "This username is already in use!",
               });
             }
 
-            if(result[0].email === email){
+            if (result[0].email === email) {
               return res.status(409).send({
                 error: true,
                 msg: "This email is already in use!",
               });
             }
           }
-        })
+        });
         // hash password
         bcrypt.hash(password, 10, (error, passwordHashed) => {
           if (error) throw error;
@@ -95,7 +96,7 @@ class UserController {
             msg: "Username is incorrect",
           });
         }
-        if (result[0].type === 'BANNED'){
+        if (result[0].type === "BANNED") {
           return res.status(401).send({
             error: true,
             msg: `${result[0].username} has been banned from system`,
@@ -180,7 +181,6 @@ class UserController {
             message: "Please Login first.",
           });
         }
-
 
         // Valid
         const accessToken = authService.createAccessToken({ id: user.id });
@@ -278,7 +278,17 @@ class UserController {
 
   async updateUserByIDRequest(req, res) {
     const userID = req.params.id;
-    const {username, name, password, birthday, gender, email, phone, type, avatar} = req.body;
+    const {
+      username,
+      name,
+      password,
+      birthday,
+      gender,
+      email,
+      phone,
+      type,
+      avatar,
+    } = req.body;
     const setUsername = setConvertSQL(username, "username");
     const setName = setConvertSQL(name, "name");
     const setGender = setConvertSQL(gender, "gender");
@@ -287,20 +297,22 @@ class UserController {
     const setEmail = setConvertSQL(email, "email");
     const setType = setConvertSQL(type, "type");
     const setAvatar = setConvertSQL(avatar, "avatar");
-    const hashedPassword = (pass) => 
+    const hashedPassword = (pass) =>
       bcrypt.hash(pass, 10, (error, passwordHashed) => {
         if (error) throw error;
         return passwordHashed;
-      })
-    const setPassword = setConvertSQL(hashedPassword(password),"password")
-
+      });
+    const setPassword = setConvertSQL(
+      password ? hashedPassword(password) : false,
+      "password"
+    );
 
     try {
       var command =
-      "UPDATE `Order` SET " +
-      `${setUsername}${setPassword}${setName}${setGender}${setPhone}${setBirthday}${setEmail}${setType}${setAvatar}` +
-      " update_time = CURRENT_TIMESTAMP WHERE id = " +
-      userID;
+        "UPDATE `Order` SET " +
+        `${setUsername}${setPassword}${setName}${setGender}${setPhone}${setBirthday}${setEmail}${setType}${setAvatar}` +
+        " update_time = CURRENT_TIMESTAMP WHERE id = " +
+        userID;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);
@@ -308,7 +320,6 @@ class UserController {
           error: false,
           msg: `Update Success`,
         });
-
       });
     } catch (err) {
       console.log(err);
@@ -317,52 +328,50 @@ class UserController {
 
   async updatePassByIDRequest(req, res) {
     let command = "";
-    const oldpass = req.query.oldpass;
-    const newpass = req.query.newpass;
+    const { oldPass, newPass } = req.body;
     const userID = req.params.id;
 
-    //console.log(oldpass);
+    //console.log(oldPass);
     command = "SELECT * FROM `User` WHERE id =" + userID;
-    SQLpool.execute(command, (err, result, field) => {
-      if (err) throw err;
 
-      // check oldpass == nowpass
-      bcrypt.compare(oldpass, result[0]["password"], (bErr, bResult) => {
-        console.log("oldpass = nowpass")
-        // wrong password
-        if (bErr) {
-          console.log("check oldpass error");
-        }
-        // if oldpass = nowpass => upload newpass
-        if (bResult) {
-          bcrypt.hash(newpass, 10, (error, passwordHashed) => {
-            try {
+    try {
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        bcrypt.compare(oldPass, result[0]["password"], (bErr, bResult) => {
+          // wrong password
+          if (bErr) {
+            throw bErr;
+          }
+          // if oldPass = nowpass => upload newPass
+          if (bResult) {
+            bcrypt.hash(newPass, 10, (error, passwordHashed) => {
               command =
                 "UPDATE `User` SET `" +
-                'password' +
+                "password" +
                 "` = '" +
                 passwordHashed +
                 "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
                 userID;
               SQLpool.execute(command, (err, result, field) => {
-                if (err) throw err;
+                if (error) throw error;
                 console.log(result);
                 res.status(200).send({
                   error: false,
                   msg: `Update Success`,
                 });
-
               });
-            } catch (err) {
-              console.log(err);
-            }
+            });
+          }
+          return res.status(401).send({
+            error: true,
+            msg: "Password is incorrect!",
           });
-        }
-
+        });
       });
-
-    });
-
+    } catch (err) {
+      console.log(err);
+      res.send({ error: true, msg: err });
+    }
   }
 
   async deleteUserByIDRequest(req, res) {

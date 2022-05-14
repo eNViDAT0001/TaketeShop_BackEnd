@@ -14,6 +14,7 @@ function route(app) {
     app.use('/product', productRoute)
     app.use('/address', addressRouter)
     app.use('/banner', bannerRouter)
+    app.use('/category', categoryRouter)
     app.use('/cart', cartRouter)
     app.use('/comment', commentRouter)
     app.use('/image', imageRouter)

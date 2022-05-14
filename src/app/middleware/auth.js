@@ -61,6 +61,10 @@ const verifyTokenWithSHOPRoles = (req, res, next) => {
         res.status(401);
         return res.send("Not allowed, require a SHOP");
       }
+      if (result[0].type === "BANNED") {
+        res.status(401);
+        return res.send("Not allowed, Account has been banned");
+      }
       next();
     });
   } catch (error) {
@@ -92,9 +96,13 @@ const verifyTokenWithSTAFFRoles = (req, res, next) => {
           message: "Invalid User",
         });
 
-      if (result[0].type !== "SHOP" || result[0].type !== "STAFF") {
+      if (result[0].type === "CUSTOMER") {
         res.status(401);
         return res.send("Not allowed, require a STAFF or SHOP");
+      }
+      if (result[0].type === "BANNED") {
+        res.status(401);
+        return res.send("Not allowed, Account has been banned");
       }
       next();
     });

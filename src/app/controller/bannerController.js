@@ -8,8 +8,8 @@ const GET_ALL_BANNER_DETAIL = (field, value) =>
   "Banner.discount, " +
   "Banner.image, " +
   "Banner.endTime, " +
-  'GROUP_CONCAT(CONCAT("{id: ",Product.id,"}")) as productID, ' +
-  "Banner.create_time, Banner.update_time" +
+  'GROUP_CONCAT(Product.id) as productID, ' +
+  "Banner.create_time, Banner.update_time " +
   "FROM `Product` " +
   "JOIN `BannerDetail` ON `BannerDetail`.`product_id` = `Product`.`id` " +
   "JOIN `Banner` ON `BannerDetail`.`banner_id` = `Banner`.`id` " +

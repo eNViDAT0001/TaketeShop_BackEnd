@@ -6,12 +6,16 @@ const GET_ALL_COMMENT_DETAIL = (field, value) =>
   "`Comment`.`id`, " +
   "`Comment`.`product_id`, " +
   "`Comment`.`user_id`, " +
+  "`User`.name AS username,  " +
+  "`User`.`avatar`,  " +
   "`Comment`.`comment`, " +
   "`Comment`.`rating`, " +
-  'GROUP_CONCAT(CONCAT("{id: ",CommentImage.id,""), CONCAT(", image: \'",CommentImage.image_path,"\'}")) as images, ' +
+  'GROUP_CONCAT(CONCAT(CommentImage.id," "), CONCAT(CommentImage.image_path)) as images, ' +
   "`Comment`.`create_time`, " +
   "`Comment`.`update_time` " +
-  "FROM `Comment` LEFT JOIN CommentImage ON `Comment`.`id` = CommentImage.comment_id " +
+  "FROM `Comment` " +
+  "INNER JOIN `User` ON User.id = `Comment`.user_id " +
+  "LEFT JOIN CommentImage ON `Comment`.`id` = CommentImage.comment_id " +
   (field ? `WHERE Comment.${field}` + "=" + `'${value}'` : "") +
   "GROUP BY `Comment`.id;";
 class CommentController {
@@ -22,9 +26,10 @@ class CommentController {
   async getAllComment(req, res) {
     try {
       var command = GET_ALL_COMMENT_DETAIL();
+      console.log(command);
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        res.send(result)
+        res.send(result);
       });
     } catch (err) {
       console.log(err);
@@ -35,12 +40,26 @@ class CommentController {
     }
   }
 
-  async getCommentWithProductID(req, res) {
+  async getCommentWithUserID(req, res) {
     try {
-      var command = GET_ALL_COMMENT_DETAIL("product_id", req.params.id)
+      var command = GET_ALL_COMMENT_DETAIL("user_id", req.params.id);
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        res.send(result)
+        res.send(result);
+      });
+    } catch (err) {
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
+  async getCommentWithProductID(req, res) {
+    try {
+      var command = GET_ALL_COMMENT_DETAIL("product_id", req.params.id);
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        res.send(result);
       });
     } catch (err) {
       res.send({
@@ -76,9 +95,9 @@ class CommentController {
     }
   }
   async deleteCommentByIDRequest(req, res) {
-
     try {
-      var command = "DELETE FROM Comment WHERE `Comment`.`id` = " + req.params.id;
+      var command =
+        "DELETE FROM Comment WHERE `Comment`.`id` = " + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);

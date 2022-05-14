@@ -297,15 +297,16 @@ class UserController {
     const setEmail = setConvertSQL(email, "email");
     const setType = setConvertSQL(type, "type");
     const setAvatar = setConvertSQL(avatar, "avatar");
+    const setPassword = setConvertSQL(
+      password ? hashedPassword(password) : false,
+      "password"
+    );
     const hashedPassword = (pass) =>
       bcrypt.hash(pass, 10, (error, passwordHashed) => {
         if (error) throw error;
         return passwordHashed;
       });
-    const setPassword = setConvertSQL(
-      password ? hashedPassword(password) : false,
-      "password"
-    );
+
 
     try {
       var command =

@@ -21,7 +21,7 @@ const GET_ALL_PRODUCT_DETAIL = (field, value) =>
   "Product.quantity, " +
   "Product.discount, " +
   "Unit.name as unit, " +
-  'GROUP_CONCAT(CONCAT("{id: ",ProductImage.id,""), CONCAT(", image: \'",ProductImage.image_path,"\'}")) as images ' +
+  'GROUP_CONCAT(CONCAT(ProductImage.id," "), CONCAT(ProductImage.image_path)) as images ' +
   "FROM Product " +
   "JOIN Category ON Product.category_id = Category.id " +
   "JOIN ProductImage ON ProductImage.product_id = Product.id " +
@@ -53,23 +53,6 @@ class ProductController {
     }
   }
 
-  // async getProductWithCategoryID(req, res, next) {
-  //   try {
-  //     var command =
-  //       "SELECT * FROM `Product` WHERE category_id =" + req.query.categoryID;
-  //     SQLpool.execute(command, (err, result, field) => {
-  //       if (err) throw err;
-  //       console.log(result.length);
-  //       res.send(result);
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //     res.send({
-  //       error: true,
-  //       msg: err,
-  //     });
-  //   }
-  // }
   async getProductWithCategoryID(req, res, next) {
     try {
       var command = GET_ALL_PRODUCT_DETAIL("category_id", req.query.categoryID);

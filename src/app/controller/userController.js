@@ -307,10 +307,9 @@ class UserController {
         return passwordHashed;
       });
 
-
     try {
       var command =
-        "UPDATE `Order` SET " +
+        "UPDATE `User` SET " +
         `${setUsername}${setPassword}${setName}${setGender}${setPhone}${setBirthday}${setEmail}${setType}${setAvatar}` +
         " update_time = CURRENT_TIMESTAMP WHERE id = " +
         userID;
@@ -356,11 +355,11 @@ class UserController {
               SQLpool.execute(command, (err, result, field) => {
                 if (error) throw error;
                 console.log(result);
-                res.status(200).send({
-                  error: false,
-                  msg: `Update Success`,
-                });
               });
+            });
+            return res.status(200).send({
+              error: false,
+              msg: `Update Success`,
             });
           }
           return res.status(401).send({

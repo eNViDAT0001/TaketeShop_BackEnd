@@ -324,6 +324,7 @@ class UserController {
         if (bResult) {
           bcrypt.hash(newpass, 10, (error, passwordHashed) => {
             try {
+              console.log("check oldpass OK");
               command =
                 "UPDATE `User` SET `" +
                 'password' +
@@ -343,6 +344,11 @@ class UserController {
             } catch (err) {
               console.log(err);
             }
+          });
+        } else {
+          console.log("check oldpass error");
+          res.status(200).send({
+            error: true,            
           });
         }
 

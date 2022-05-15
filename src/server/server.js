@@ -5,7 +5,7 @@ const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const routes = require('../routes')
 const chatDB = require('../database/connectMongo')
-const io = require('socket.io')(5000)
+//const io = require('socket.io')(5000)
 var bodyParser = require('body-parser')
 
 const app = express();
@@ -26,13 +26,13 @@ const port = process.env.PORT || 5000;
 chatDB.connect();
 routes(app);
 
-io.on('connection',(socket)=>{
-  console.log('a user connected');
-  socket.emit('message','hello world');
-  socket.on('disconnect',()=>{
-    console.log('a user disconnected');
-  })
-})
+// io.on('connection',(socket)=>{
+//   console.log('a user connected');
+//   socket.emit('message','hello world');
+//   socket.on('disconnect',()=>{
+//     console.log('a user disconnected');
+//   })
+// })
 
 app.listen(port, (err) => {
   if (err) console.log("Server Error")

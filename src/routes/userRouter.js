@@ -5,17 +5,19 @@ const { signupValidation, loginValidation } = require("../app/validations/authVa
 const { userController } = require('../app/controller/index')
 
 router.get('/getAllUser',userController.getAllUser)
+router.get('/getAllStaff',verifyTokenWithSHOPRoles,userController.getAllStaff)
 router.get('/:id', verifyToken,userController.getUserByIDRequest)
 router.patch('/:id', verifyToken, userController.updateUserByIDRequest)
+//router.patch('/staff/:id', verifyTokenWithSTAFFRoles, userController.updateUserByIDRequest)
+router.patch('/addmin/staff/:id', verifyTokenWithSHOPRoles, userController.updateStaffByIDRequest)
 router.patch('/password/:id', verifyToken, userController.updatePassByIDRequest)
+router.patch('/addmin/staff/password/:id', verifyTokenWithSHOPRoles, userController.updatePassByIDAdmin)
 router.post('/register', signupValidation, userController.register)
 router.post('/login', loginValidation, userController.login)
 router.delete('/:id', userController.deleteUserByIDRequest)
+router.delete('/addmin/staff/:id',verifyTokenWithSHOPRoles, userController.deleteStaffByIDRequest)
 router.get('/admin/:id', verifyTokenWithSHOPRoles, userController.getUserByIDRequestADMIN)
 router.get('/refresh_token', userController.refreshToken)
 router.get('/', userController.index)
-
-
-
 
 module.exports = router

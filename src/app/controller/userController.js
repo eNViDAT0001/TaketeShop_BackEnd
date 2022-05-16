@@ -364,7 +364,8 @@ class UserController {
           }
           return res.status(401).send({
             error: true,
-            msg: "Password is incorrect!",
+            msg: "Mật khẩu cũ không đúng, vui lòng nhập lại",
+        
           });
         });
       });

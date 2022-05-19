@@ -1,13 +1,13 @@
 const SQLpool = require("../../database/connectSQL");
 const { setConvertSQL } = require("../../ulti/ulti");
-
+const cloudinary = require("../../database/cloudinary");
 class ImageController {
   index(req, res, next) {
     res.send("Image controller....");
   }
 
   async getAllImage(req, res) {
-    const type = req.query.type + Image;
+    const type = req.query.type + 'Image';
     try {
       var command = "SELECT * from " + type;
       SQLpool.execute(command, (err, result, field) => {
@@ -24,7 +24,7 @@ class ImageController {
   }
 
   async getImageByID(req, res) {
-    const type = req.query.type + Image;
+    const type = req.query.type + 'Image';
     try {
       var command = "SELECT * FROM " + type + " WHERE id =" + req.query.imageID;
       SQLpool.execute(command, (err, result, field) => {
@@ -95,6 +95,42 @@ class ImageController {
         if (err) throw err;
         console.log("Add Image Success");
       });
+    } catch (err) {
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
+  async addImageCloudinary(req, res) {
+    const { image } = req.body;
+    try {
+      const uploadedResponse = await cloudinary.uploader
+        .upload(image, {
+          upload_preset: "TaketeShop",
+        })
+        .catch((err) => {
+          throw err;
+        });
+      console.log(uploadedResponse);
+      res.json({ msg: "Image uploaded" });
+    } catch (err) {
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
+  async getAllImageCloudinary(req, res) {
+    try {
+      const { resources } = await cloudinary.search
+        .expression("folder:TaketeShop")
+        .max_results(30)
+        .execute();
+      const publicIds = resources.map((file) => file.url);
+      res.send(publicIds);
     } catch (err) {
       console.log(err);
       res.send({

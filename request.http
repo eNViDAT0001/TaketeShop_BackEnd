@@ -1,17 +1,5 @@
-# GET http://localhost:5000/product/all
-#  GET http://localhost:5000/user/getAllUser
-
-DELETE http://localhost:5000/user/32
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzMsImlhdCI6MTY1MDYyODI1NCwiZXhwIjoxNjUwNzE0NjU0fQ.51D2aeI0hIvASZshjWL5Emqe5oQRnMuTnGejnNgqelE
+GET http://localhost:5000/product/all
 
 
-
-DELETE http://localhost:5000/user/14
-
-
-GET http://localhost:5000/product/productList?categoryID=3
-
-//Add Product without Image Request
-POST http://localhost:5000/product/addWthImage?categoryID=7&userID=2&name=TrungVit&descriptions=Perfectionnn&price=200000&quantity=200&unitID=3
 
 //

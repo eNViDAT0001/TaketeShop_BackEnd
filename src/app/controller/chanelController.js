@@ -14,6 +14,17 @@ class ChanelCotroller {
         }
     }
 
+    async getAllChanelADMIN(req, res) {
+        try {            
+            const question = await chanelSchema.find().populate()
+            res.send(question);
+            console.log("get all chanel susscess")
+        }
+        catch (err) {
+            res.send('Error' + err)
+        }
+    }
+
 
     async addChanel(req, res) {       
         const questions = await new chanelSchema({

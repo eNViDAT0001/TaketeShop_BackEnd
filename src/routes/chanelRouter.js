@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const {verifyToken, verifyTokenWithSHOPRoles, verifyTokenWithSTAFFRoles } = require('../app/middleware/auth')
 const { chanelController } = require("../app/controller/index");
 
 router.get('/',chanelController.getAllChanel)//http://localhost:5000/chanel/

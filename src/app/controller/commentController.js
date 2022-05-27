@@ -26,7 +26,6 @@ class CommentController {
   async getAllComment(req, res) {
     try {
       var command = GET_ALL_COMMENT_DETAIL();
-      console.log(command);
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);

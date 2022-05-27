@@ -10,7 +10,7 @@ class CategoryController {
 
   async getAllCategory(req, res) {
     try {
-      var command = "SELECT * FROM Category;";
+      var command = "SELECT `Category`.* FROM `Product` JOIN `Category` ON `Product`.`category_id` = `Category`.`id` GROUP BY Category.id;";
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);

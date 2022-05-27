@@ -2,10 +2,9 @@ const { authService } = require("../services");
 const { authValidation } = require("../validations");
 const { setConvertSQL } = require("../../ulti/ulti");
 const SQLpool = require("../../database/connectSQL");
-const GET_ALL_PRODUCT_DETAIL = (field, value) =>
+const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
   "SELECT " +
-  "result.*, " +
-  "CONVERT(IF (SUM(OrderItems.quantity) IS null, 0, SUM(OrderItems.quantity)), UNSIGNED) AS sold " +
+  "result.* " +
   "FROM ( " +
   "SELECT " +
   "Product.create_time, " +
@@ -21,25 +20,35 @@ const GET_ALL_PRODUCT_DETAIL = (field, value) =>
   "Product.quantity, " +
   "Product.discount, " +
   "Unit.name as unit, " +
-  'GROUP_CONCAT(CONCAT(ProductImage.id," "), CONCAT(ProductImage.image_path)) as images ' +
+  'GROUP_CONCAT(CONCAT(ProductImage.id," "), CONCAT(ProductImage.image_path)) as images, ' +
+  "CONVERT(IF (SUM(WishList.id) IS null, 0, 1), UNSIGNED) AS liked, " +
+  "CONVERT(IF (SUM(OrderItems.quantity) IS null, 0, SUM(OrderItems.quantity)), UNSIGNED) AS sold " +
   "FROM Product " +
+  "LEFT JOIN WishList ON WishList.product_id = Product.id " +
+  "LEFT JOIN OrderItems ON OrderItems.product_id = Product.id " +
   "JOIN Category ON Product.category_id = Category.id " +
   "JOIN ProductImage ON ProductImage.product_id = Product.id " +
   "JOIN Unit ON Product.unit_id = Unit.id GROUP by ProductImage.product_id) result " +
-  "LEFT JOIN OrderItems ON OrderItems.product_id = result.id " +
-  (field ? (`WHERE result.${field}` + "=" + `'${value}'`) : "") +
+  (field ? `WHERE result.${field}` + "=" + `'${value}'` : "") +
   " " +
   "GROUP by result.id " +
-  "ORDER BY result.id asc ";
+  (filter ? `ORDER BY result.${filter} ${sort}` : "ORDER BY result.id asc ") +
+  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
 
 class ProductController {
   index(req, res, next) {
     res.send("Product controller....");
   }
 
-  async getAllProduct(req, res) {
+  async getAllProductWithPagination(req, res) {
+    const page = req.query.page;
     try {
-      var command = GET_ALL_PRODUCT_DETAIL();
+      var command = GET_ALL_PRODUCT_DETAIL({
+        page: +page,
+        filter: req.query.filter,
+        sort: req.query.sort,
+      });
+      console.log()
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -53,9 +62,16 @@ class ProductController {
     }
   }
 
-  async getProductWithCategoryID(req, res, next) {
+  async getProductWithCategoryIDPagination(req, res, next) {
     try {
-      var command = GET_ALL_PRODUCT_DETAIL("category_id", req.query.categoryID);
+      var command = GET_ALL_PRODUCT_DETAIL({
+        field: "category_id",
+        value: req.query.value,
+        filter: req.query.filter,
+        sort: req.query.sort,
+        page: +req.query.page,
+      });
+      console.log(command)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -68,9 +84,13 @@ class ProductController {
       });
     }
   }
+
   async getProductByID(req, res) {
     try {
-      var command = GET_ALL_PRODUCT_DETAIL( "id",req.params.id);
+      var command = GET_ALL_PRODUCT_DETAIL({
+        field: "id",
+        value: req.params.id,
+      });
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result.length);

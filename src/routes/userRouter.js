@@ -14,6 +14,7 @@ router.patch('/password/:id', verifyToken, userController.updatePassByIDRequest)
 router.patch('/password/admin/:id', verifyTokenWithSHOPRoles, userController.updatePassByIDRequestADMIN)
 router.patch('/password/staff/:id', verifyTokenWithSTAFFRoles, userController.updatePassByIDRequestSTAFF)
 router.patch('/addmin/staff/password/:id', verifyTokenWithSHOPRoles, userController.updatePassByIDAdmin)
+
 router.post('/register', signupValidation, userController.register)
 router.post('/login', loginValidation, userController.login)
 router.delete('/:id', userController.deleteUserByIDRequest)

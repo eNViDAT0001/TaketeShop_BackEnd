@@ -402,7 +402,7 @@ class UserController {
     let command = "";
     const { oldPass, newPass } = req.body;
     const userID = req.params.id;
-    console.log(oldPass);
+    console.log("oldPass");
     command = "SELECT * FROM `User` WHERE id =" + userID;
     try {
       SQLpool.execute(command, (err, result, field) => {

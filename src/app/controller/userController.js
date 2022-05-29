@@ -398,7 +398,100 @@ class UserController {
       console.log(err);
     }
   }
+  async updatePassByIDRequestSTAFF(req, res) {
+    let command = "";
+    const { oldPass, newPass } = req.body;
+    const userID = req.params.id;
 
+    //console.log(oldPass);
+    command = "SELECT * FROM `User` WHERE id =" + userID;
+
+    try {
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        bcrypt.compare(oldPass, result[0]["password"], (bErr, bResult) => {
+          // wrong password
+          if (bErr) {
+            throw bErr;
+          }
+          // if oldPass = nowpass => upload newPass
+          if (bResult) {
+            bcrypt.hash(newPass, 10, (error, passwordHashed) => {
+              command =
+                "UPDATE `User` SET `" +
+                "password" +
+                "` = '" +
+                passwordHashed +
+                "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
+                userID;
+              SQLpool.execute(command, (err, result, field) => {
+                if (error) throw error;
+                console.log(result);
+              });
+            });
+            return res.status(200).send({
+              error: false,
+              msg: `Update Success`,
+            });
+          }
+          return res.status(401).send({
+            error: true,
+            msg: "Password is incorrect!",
+          });
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      res.send({ error: true, msg: err });
+    }
+  }
+  async updatePassByIDRequestADMIN(req, res) {
+    let command = "";
+    const { oldPass, newPass } = req.body;
+    const userID = req.params.id;
+
+    //console.log(oldPass);
+    command = "SELECT * FROM `User` WHERE id =" + userID;
+
+    try {
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        bcrypt.compare(oldPass, result[0]["password"], (bErr, bResult) => {
+          // wrong password
+          if (bErr) {
+            throw bErr;
+          }
+          // if oldPass = nowpass => upload newPass
+          if (bResult) {
+            bcrypt.hash(newPass, 10, (error, passwordHashed) => {
+              command =
+                "UPDATE `User` SET `" +
+                "password" +
+                "` = '" +
+                passwordHashed +
+                "', `update_time` = CURRENT_TIMESTAMP WHERE id = " +
+                userID;
+              SQLpool.execute(command, (err, result, field) => {
+                if (error) throw error;
+                console.log(result);
+              });
+            });
+            return res.status(200).send({
+              error: false,
+              msg: `Update Success`,
+            });
+          }
+          return res.status(401).send({
+            error: true,
+            msg: "Password is incorrect!",
+          });
+        });
+      });
+    } catch (err) {
+      console.log(err);
+      res.send({ error: true, msg: err });
+    }
+  }
   async updatePassByIDRequest(req, res) {
     let command = "";
     const { oldPass, newPass } = req.body;

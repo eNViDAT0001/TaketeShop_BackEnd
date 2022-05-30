@@ -55,10 +55,11 @@ class ProductController {
 
   async getProductWithCategoryID(req, res, next) {
     try {
-      var command = GET_ALL_PRODUCT_DETAIL("category_id", req.query.categoryID);
+      const categoryID = req.params.id ;
+      var command = GET_ALL_PRODUCT_DETAIL("category_id", categoryID);
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        res.send(result);
+        res.send(result);       
       });
     } catch (err) {
       console.log(err);

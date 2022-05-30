@@ -19,8 +19,7 @@ class UserController {
       SQLpool.getConnection((err, connection) => {
         if (err) throw err;
         //check duplicated username and email
-        command = `SELECT * FROM User WHERE email = ${"'" + email + "'"} OR ${"'" + username + "'"
-          };`;
+        command = `SELECT * FROM User WHERE email = '${email}' OR username = '${username}'`;
 
         connection.query(command, (error, result) => {
           if (error) throw error;

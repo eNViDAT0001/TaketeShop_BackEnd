@@ -34,6 +34,37 @@ const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
   "GROUP by result.id " +
   (filter ? `ORDER BY result.${filter} ${sort}` : "ORDER BY result.id asc ") +
   (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
+// const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
+//   "SELECT " +
+//   "result.*, " +
+//   "CONVERT(IF (SUM(OrderItems.quantity) IS null, 0, SUM(OrderItems.quantity)), UNSIGNED) AS sold " +
+//   "FROM ( " +
+//   "SELECT " +
+//   "Product.create_time, " +
+//   "Product.update_time, " +
+//   "Product.id, " +
+//   "Product.category_id as category_id, " +
+//   "Product.user_id, " +
+//   "Product.unit_id, " +
+//   "Product.name, " +
+//   "Category.name as category_name, " +
+//   "Product.descriptions, " +
+//   "Product.price, " +
+//   "Product.quantity, " +
+//   "Product.discount, " +
+//   "Unit.name as unit, " +
+//   'GROUP_CONCAT(CONCAT(ProductImage.id," "), CONCAT(ProductImage.image_path)) as images ' +
+//   "FROM Product " +
+//   "JOIN Category ON Product.category_id = Category.id " +
+//   "JOIN ProductImage ON ProductImage.product_id = Product.id " +
+//   "JOIN Unit ON Product.unit_id = Unit.id GROUP by ProductImage.product_id) result " +
+//   "LEFT JOIN WishList ON WishList.product_id = Product.id " +
+//   "LEFT JOIN OrderItems ON OrderItems.product_id = result.id " +
+//   (field ? (`WHERE result.${field}` + "=" + `'${value}'`) : "") +
+//   " " +
+//   "GROUP by result.id " +
+//   (filter ? `ORDER BY result.${filter} ${sort}` : "ORDER BY result.id asc ") +
+//   (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
 
 class ProductController {
   index(req, res, next) {
@@ -91,6 +122,7 @@ class ProductController {
         field: "id",
         value: req.params.id,
       });
+      console.log(command)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result.length);

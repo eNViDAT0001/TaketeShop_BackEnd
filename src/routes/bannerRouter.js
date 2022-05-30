@@ -7,5 +7,6 @@ router.get("/list/:id", bannerController.getProductIDWithBannerID);
 router.delete("/:id", bannerController.deleteBannerByIDRequest);
 router.patch("/:id", bannerController.updateBannerByIDRequest);
 router.get("/", bannerController.index);
+router.get("/:id", bannerController.getBannerByIDRequest);
 
 module.exports = router;

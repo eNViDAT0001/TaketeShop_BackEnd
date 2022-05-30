@@ -51,6 +51,21 @@ const GET_ALL_BANNER_DETAIL = (field, value) =>
         });
       }
     }
+    async getBannerByIDRequest(req, res) {
+      try {
+        var command = "SELECT * FROM `Banner` WHERE id =" + req.params.id;
+        SQLpool.execute(command, (err, result, field) => {
+          if (err) throw err;
+          console.log(result.length);
+          res.send(result);
+        });
+      } catch (err) {
+        res.send({
+          error: true,
+          msg: err,
+        });
+      }
+    }
 
     async updateBannerByIDRequest(req, res) {
       const { title, discount, image } = req.body;

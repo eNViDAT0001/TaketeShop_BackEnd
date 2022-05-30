@@ -102,10 +102,11 @@ class ProductController {
         sort: req.query.sort,
         page: +req.query.page,
       });
-      console.log(command)
+      
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        res.send(result);
+        console.log(result);
+        res.send(result);        
       });
     } catch (err) {
       console.log(err);

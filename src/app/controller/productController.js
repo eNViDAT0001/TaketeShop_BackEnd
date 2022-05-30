@@ -32,45 +32,43 @@ const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
   (field ? `WHERE result.${field}` + "=" + `'${value}'` : "") +
   " " +
   "GROUP by result.id " +
-  (filter ? `ORDER BY result.${filter} ${sort}` : "ORDER BY result.id asc ") +
+  (filter ? `ORDER BY result.${filter} ` : "ORDER BY result.id ") +
+  (sort ? sort : "ASC") +
+  " " +
   (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
-// const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
-//   "SELECT " +
-//   "result.*, " +
-//   "CONVERT(IF (SUM(OrderItems.quantity) IS null, 0, SUM(OrderItems.quantity)), UNSIGNED) AS sold " +
-//   "FROM ( " +
-//   "SELECT " +
-//   "Product.create_time, " +
-//   "Product.update_time, " +
-//   "Product.id, " +
-//   "Product.category_id as category_id, " +
-//   "Product.user_id, " +
-//   "Product.unit_id, " +
-//   "Product.name, " +
-//   "Category.name as category_name, " +
-//   "Product.descriptions, " +
-//   "Product.price, " +
-//   "Product.quantity, " +
-//   "Product.discount, " +
-//   "Unit.name as unit, " +
-//   'GROUP_CONCAT(CONCAT(ProductImage.id," "), CONCAT(ProductImage.image_path)) as images ' +
-//   "FROM Product " +
-//   "JOIN Category ON Product.category_id = Category.id " +
-//   "JOIN ProductImage ON ProductImage.product_id = Product.id " +
-//   "JOIN Unit ON Product.unit_id = Unit.id GROUP by ProductImage.product_id) result " +
-//   "LEFT JOIN WishList ON WishList.product_id = Product.id " +
-//   "LEFT JOIN OrderItems ON OrderItems.product_id = result.id " +
-//   (field ? (`WHERE result.${field}` + "=" + `'${value}'`) : "") +
-//   " " +
-//   "GROUP by result.id " +
-//   (filter ? `ORDER BY result.${filter} ${sort}` : "ORDER BY result.id asc ") +
-//   (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
 
+const GET_RAW_PRODUCT = ({ field, value, filter, sort, page }) =>
+  "SELECT * FROM Product " +
+  (field ? `WHERE Product.${field}` + "=" + `'${value}' ` : " ") +
+  (filter ? `ORDER BY Product.${filter} ` : "ORDER BY Product.id ") +
+  (sort ? sort : "ASC") +
+  " " +
+  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
 class ProductController {
   index(req, res, next) {
     res.send("Product controller....");
   }
-
+  async getRawProductWithPagination(req, res) {
+    try {
+      var command = GET_RAW_PRODUCT({
+        value: req.query.value,
+        filter: req.query.filter,
+        sort: req.query.sort,
+        page: +req.query.page,
+      });
+      console.log();
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        res.send(result);
+      });
+    } catch (err) {
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
   async getAllProductWithPagination(req, res) {
     const page = req.query.page;
     try {
@@ -79,7 +77,7 @@ class ProductController {
         filter: req.query.filter,
         sort: req.query.sort,
       });
-      console.log()
+      console.log();
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -102,7 +100,7 @@ class ProductController {
         sort: req.query.sort,
         page: +req.query.page,
       });
-      console.log(command)
+      console.log(command);
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -122,7 +120,7 @@ class ProductController {
         field: "id",
         value: req.params.id,
       });
-      console.log(command)
+      console.log(command);
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result.length);

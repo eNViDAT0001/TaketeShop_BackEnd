@@ -31,8 +31,62 @@ class messagerController {
             res.send('Error' + err)
         }
     }
+    async getMessagerFromChanelIdSTAFF(req, res) {
+        const chanelId = req.params.chanelId;
+        //var socket = req.app.get('socketIO');
+        //socket.emit('hello');
+        try {
+            const messages = await messagerSchema.find({ chanelId: chanelId })
+            //.populate()
+
+            res.send(messages);
+            console.log("get messagers: " + messages.length)
+            //count = count + 10;
+        } catch (err) {
+            res.send('Error' + err)
+        }
+    }
+    async getMessagerFromChanelIdADMIN(req, res) {
+        const chanelId = req.params.chanelId;
+        //var socket = req.app.get('socketIO');
+        //socket.emit('hello');
+        try {
+            const messages = await messagerSchema.find({ chanelId: chanelId })
+            //.populate()
+
+            res.send(messages);
+            console.log("get messagers: " + messages.length)
+            //count = count + 10;
+        } catch (err) {
+            res.send('Error' + err)
+        }
+    }
 
     async getMessagerFromUserId(req, res) {
+        const userId = req.params.userId
+        try {
+            const messages = await messagerSchema.find({ userId: userId })
+                .populate()
+            res.send(messages);
+
+        } catch (err) {
+            res.send('Error' + err)
+        }
+    }
+
+    async getMessagerFromUserIdADMIN(req, res) {
+        const userId = req.params.userId
+        try {
+            const messages = await messagerSchema.find({ userId: userId })
+                .populate()
+            res.send(messages);
+
+        } catch (err) {
+            res.send('Error' + err)
+        }
+    }
+
+    async getMessagerFromUserIdSTAFF(req, res) {
         const userId = req.params.userId
         try {
             const messages = await messagerSchema.find({ userId: userId })

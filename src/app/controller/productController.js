@@ -93,7 +93,6 @@ class ProductController {
         sort: req.query.sort,
         page: +req.query.page,
       });
-      console.log();
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -130,7 +129,8 @@ class ProductController {
         sort: req.query.sort,
         page: +req.query.page,
       });
-      console.log();
+      console.log(command);
+
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);

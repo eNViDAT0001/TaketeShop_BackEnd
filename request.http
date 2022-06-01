@@ -1,4 +1,4 @@
-GET http://localhost:5000/product/search?value=moi
+GET http://localhost:5000/product/all
 
 
 

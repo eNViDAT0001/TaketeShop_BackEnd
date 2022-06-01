@@ -31,16 +31,17 @@ const port = process.env.PORT || 5000;
 chatDB.connect();
 routes(app);
 
-
 app.get('/', (req, res) => {
   res.send('TaketeShop Backend')
 })
+
 io.on('connection', (socket) => {
   console.log('a user connected');
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
 });
+
 
 realtimeServer.listen(port, (err) => {
   if (err) console.log("Server Error")

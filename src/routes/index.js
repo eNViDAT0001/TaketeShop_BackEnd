@@ -19,7 +19,7 @@ function route(app) {
     app.use('/comment', commentRouter)
     app.use('/image', imageRouter)
     app.use('/order', orderRouter)
-    app.use('/chanel',chanelRouter)
-    app.use('/message',messageRouter)
+    app.use('/chanel', chanelRouter)
+    app.use('/message', messageRouter)
 }
 module.exports = route;

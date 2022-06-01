@@ -44,6 +44,43 @@ const GET_RAW_PRODUCT = ({ field, value, filter, sort, page }) =>
   (sort ? sort : "ASC") +
   " " +
   (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
+
+const SEARCH_TO_DETAIL_PRODUCTS = ({ value, filter, sort, page }) =>
+  "SELECT " +
+  "result.* " +
+  "FROM ( " +
+  "SELECT " +
+  "Product.create_time, " +
+  "Product.update_time, " +
+  "Product.id, " +
+  "Product.category_id as category_id, " +
+  "Product.user_id, " +
+  "Product.unit_id, " +
+  "Product.name, " +
+  "Category.name as category_name, " +
+  "Product.descriptions, " +
+  "Product.price, " +
+  "Product.quantity, " +
+  "Product.discount, " +
+  "Unit.name as unit, " +
+  'GROUP_CONCAT(CONCAT(ProductImage.id," "), CONCAT(ProductImage.image_path)) as images, ' +
+  "CONVERT(IF (SUM(WishList.id) IS null, 0, 1), UNSIGNED) AS liked, " +
+  "CONVERT(IF (SUM(OrderItems.quantity) IS null, 0, SUM(OrderItems.quantity)), UNSIGNED) AS sold " +
+  "FROM Product " +
+  "LEFT JOIN WishList ON WishList.product_id = Product.id " +
+  "LEFT JOIN OrderItems ON OrderItems.product_id = Product.id " +
+  "JOIN Category ON Product.category_id = Category.id " +
+  "JOIN ProductImage ON ProductImage.product_id = Product.id " +
+  "JOIN Unit ON Product.unit_id = Unit.id " +
+  ("WHERE MATCH(Product.name) AGAINST(" +
+    `'${value}'` +
+    " WITH QUERY EXPANSION) ") +
+  " GROUP by ProductImage.product_id) result " +
+  "GROUP by result.id " +
+  (filter ? `ORDER BY result.${filter} ` : "ORDER BY result.id ") +
+  (sort ? sort : "ASC") +
+  " " +
+  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
 class ProductController {
   index(req, res, next) {
     res.send("Product controller....");
@@ -69,15 +106,59 @@ class ProductController {
       });
     }
   }
-  async getAllProductWithPagination(req, res) {
-    const page = req.query.page;
+  async searchRawProduct(req, res) {
     try {
-      var command = GET_ALL_PRODUCT_DETAIL({
-        page: +page,
+      var command = "SELECT * FROM PRODUCT";
+      console.log();
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        res.send(result);
+      });
+    } catch (err) {
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
+  async searchProductWithPagination(req, res) {
+    try {
+      var command = SEARCH_TO_DETAIL_PRODUCTS({
+        value: req.query.value,
         filter: req.query.filter,
         sort: req.query.sort,
+        page: +req.query.page,
       });
       console.log();
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        res.send(result);
+      });
+    } catch (err) {
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
+  async getAllProductWithPagination(req, res) {
+    try {
+      var command = GET_ALL_PRODUCT_DETAIL({
+        value: req.query.value,
+        field: req.query.field,
+        filter: req.query.filter,
+        sort: req.query.sort,
+        page: +req.query.page,
+      });
+      console.log({
+        value: req.query.value,
+        field: req.query.field,
+        filter: req.query.filter,
+        sort: req.query.sort,
+        page: +req.query.page,
+      });
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -100,7 +181,13 @@ class ProductController {
         sort: req.query.sort,
         page: +req.query.page,
       });
-      console.log(command);
+      console.log({
+        field: "category_id",
+        value: req.query.value,
+        filter: req.query.filter,
+        sort: req.query.sort,
+        page: +req.query.page,
+      });
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -120,7 +207,7 @@ class ProductController {
         field: "id",
         value: req.params.id,
       });
-      console.log(command);
+      console.log({ field: "id", value: req.params.id });
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result.length);

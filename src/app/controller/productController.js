@@ -37,6 +37,41 @@ const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
   " " +
   (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
 
+  const GET_ALL_PRODUCT_DETAIL_BY_BANNERID = (bannerID) =>
+  "SELECT " +
+  "result.* " +
+  "FROM ( " +
+  "SELECT " +
+  "Product.create_time, " +
+  "Product.update_time, " +
+  "Product.id, " +
+  "Product.category_id as category_id, " +
+  "Product.user_id, " +
+  "Product.unit_id, " +
+  "Product.name, " +
+  "Category.name as category_name, " +
+  "Product.descriptions, " +
+  "Product.price, " +
+  "Product.quantity, " +
+  "Product.discount, " +
+  "Unit.name as unit, " +
+  'GROUP_CONCAT(CONCAT(ProductImage.id," "), CONCAT(ProductImage.image_path)) as images, ' +
+  "CONVERT(IF (SUM(WishList.id) IS null, 0, 1), UNSIGNED) AS liked, " +
+  "CONVERT(IF (SUM(OrderItems.quantity) IS null, 0, SUM(OrderItems.quantity)), UNSIGNED) AS sold, " +
+  "GROUP_CONCAT(DISTINCT BannerDetail.banner_id) as bannerID "  +
+  "FROM Product " +
+  "LEFT JOIN WishList ON WishList.product_id = Product.id " +
+  "LEFT JOIN OrderItems ON OrderItems.product_id = Product.id " +
+  "JOIN Category ON Product.category_id = Category.id " +
+  "JOIN ProductImage ON ProductImage.product_id = Product.id " +
+  "JOIN BannerDetail ON BannerDetail.product_id = Product.id "+
+  "JOIN Unit ON Product.unit_id = Unit.id GROUP by ProductImage.product_id) result " +
+  `WHERE result.bannerID =` + bannerID +
+  " "+
+  "GROUP by result.id " +
+   "ORDER BY result.id " +
+   "ASC" ;
+
 const GET_RAW_PRODUCT = ({ field, value, filter, sort, page }) =>
   "SELECT * FROM Product " +
   (field ? `WHERE Product.${field}` + "=" + `'${value}' ` : " ") +
@@ -188,6 +223,22 @@ class ProductController {
         sort: req.query.sort,
         page: +req.query.page,
       });
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        res.send(result);
+      });
+    } catch (err) {
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
+  async getProductWithBannerID(req, res) {
+    try {    
+      var command = GET_ALL_PRODUCT_DETAIL_BY_BANNERID(req.params.id); 
+
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);

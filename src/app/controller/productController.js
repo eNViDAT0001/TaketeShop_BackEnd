@@ -37,7 +37,7 @@ const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
   " " +
   (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
 
-  const GET_ALL_PRODUCT_DETAIL_BY_BANNERID = (bannerID) =>
+  const GET_ALL_PRODUCT_DETAIL_BY_BANNER_ID = (bannerID) =>
   "SELECT " +
   "result.* " +
   "FROM ( " +
@@ -143,7 +143,6 @@ class ProductController {
   async searchRawProduct(req, res) {
     try {
       var command = "SELECT * FROM PRODUCT";
-      console.log();
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -164,7 +163,6 @@ class ProductController {
         sort: req.query.sort,
         page: +req.query.page,
       });
-      console.log(command);
 
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
@@ -187,13 +185,7 @@ class ProductController {
         sort: req.query.sort,
         page: +req.query.page,
       });
-      console.log({
-        value: req.query.value,
-        field: req.query.field,
-        filter: req.query.filter,
-        sort: req.query.sort,
-        page: +req.query.page,
-      });
+
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -216,13 +208,7 @@ class ProductController {
         sort: req.query.sort,
         page: +req.query.page,
       });
-      console.log({
-        field: "category_id",
-        value: req.query.value,
-        filter: req.query.filter,
-        sort: req.query.sort,
-        page: +req.query.page,
-      });
+
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -237,7 +223,7 @@ class ProductController {
   }
   async getProductWithBannerID(req, res) {
     try {    
-      var command = GET_ALL_PRODUCT_DETAIL_BY_BANNERID(req.params.id); 
+      var command = GET_ALL_PRODUCT_DETAIL_BY_BANNER_ID(req.params.id); 
 
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
@@ -258,7 +244,6 @@ class ProductController {
         field: "id",
         value: req.params.id,
       });
-      console.log({ field: "id", value: req.params.id });
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result.length);

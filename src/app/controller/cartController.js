@@ -28,7 +28,6 @@ class CartController {
   async getCartItemsWithUserID(req, res) {
     try {
       var command = GET_ALL_CART_ITEMS_WITH_USER_ID(req.params.id);
-      console.log(command)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);

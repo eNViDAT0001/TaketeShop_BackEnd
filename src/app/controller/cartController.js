@@ -5,6 +5,7 @@ const GET_ALL_CART_ITEMS_WITH_USER_ID = (id) =>
   "CartItem.id, " +
   "CartItem.user_id as user_id, " +
   "Product.id as product_id, " +
+  "Category.id as category_id, " +
   "Unit.id as unit_id, " +
   "Product.name as product_name, " +
   "CartItem.quantity, " +
@@ -18,8 +19,9 @@ const GET_ALL_CART_ITEMS_WITH_USER_ID = (id) =>
   "INNER JOIN `ProductImage` ON `ProductImage`.`product_id` = `Product`.`id` " +
   "INNER JOIN `Unit` ON `Product`.`unit_id` = `Unit`.`id` " +
   "INNER JOIN `CartItem` ON `CartItem`.`product_id` = `Product`.`id` " +
+  "INNER JOIN `Category` ON `Product`.`category_id` = `Category`.`id` " +
   ("WHERE CartItem.user_id = " + `'${id}'`) +
-  "GROUP BY CartItem.id";
+  "GROUP BY CartItem.id ORDER BY CartItem.update_time DESC";
 class CartController {
   index(req, res, next) {
     res.send("Cart controller....");

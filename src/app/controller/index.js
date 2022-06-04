@@ -9,6 +9,7 @@ const commentController = require('./commentController')
 const imageController = require('./imageController')
 const orderController = require('./orderController')
 const messagerController = require('./messagerController')
+const wishlistController = require('./wishlistController')
 
 
 //var count = 0;
@@ -24,4 +25,5 @@ module.exports ={
     imageController,
     orderController,
     messagerController,
+    wishlistController,
 }

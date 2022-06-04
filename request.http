@@ -1,5 +1,5 @@
 
-GET http://localhost:5000/address/provinces?province=1&district=1
+GET http://localhost:5000/product/all
 
 
 

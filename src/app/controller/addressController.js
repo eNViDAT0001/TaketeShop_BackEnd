@@ -8,6 +8,7 @@ const GET_ALL_ADDRESS = (id) =>
   "Address.ward_id, " +
   "Address.user_id, " +
   "Address.name, " +
+  "Address.gender, " +
   "Address.phone, " +
   "Province.name as province, " +
   "District.name as district, " +
@@ -80,10 +81,11 @@ class AddressController {
         districtID,
         wardID,
         street,
+        gender,
         name,
       } = req.body;
       var command =
-        "INSERT INTO `Address` (`id`, `user_id`, `phone`, `province_id`, `district_id`, `ward_id`, `street`, `name`, `create_time`, `update_time`) VALUES (NULL, '" +
+        "INSERT INTO `Address` (`id`, `user_id`, `phone`, `province_id`, `district_id`, `ward_id`, `street`, `name`, `gender`, `create_time`, `update_time`) VALUES (NULL, '" +
         userID +
         "', '" +
         phone +
@@ -97,6 +99,8 @@ class AddressController {
         street +
         "', '" +
         name +
+        "', '" +
+        gender +
         "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
@@ -120,6 +124,7 @@ class AddressController {
       districtID,
       wardID,
       street,
+      gender
     } = req.body;
     const setUserID = setConvertSQL(userID, "user_id");
     const setPhone = setConvertSQL(phone, "phone");
@@ -128,10 +133,11 @@ class AddressController {
     const setDistrictID = setConvertSQL(districtID, "district_id");
     const setWardID = setConvertSQL(wardID, "ward_id");
     const setStreet = setConvertSQL(street, "street");
+    const setGender = setConvertSQL(gender, "gender");
     try {
       var command =
         "UPDATE Address SET " +
-        `${setName}${setPhone}${setUserID}${setProvinceID}${setDistrictID}${setWardID}${setStreet}` +
+        `${setName}${setPhone}${setUserID}${setProvinceID}${setDistrictID}${setWardID}${setStreet}${setGender}` +
         " update_time = CURRENT_TIMESTAMP WHERE id = " +
         addressID;
       SQLpool.execute(command, (err, result, field) => {

@@ -224,9 +224,10 @@ class OrderController {
         quantity,
         totalCost,
         status,
+        payment
       } = req.body;
       var command =
-        "INSERT INTO `Order` (`id`, `user_id`, `address_id`, `name`, `gender`, `phone`, `province`, `district`, `ward`, `quantity`, `total_cost`, `status`, `create_time`, `update_time`) VALUES (NULL, '" +
+        "INSERT INTO `Order` (`id`, `user_id`, `address_id`, `name`, `gender`, `phone`, `province`, `district`, `ward`, `quantity`, `total_cost`, `status`, `payment`, `create_time`, `update_time`) VALUES (NULL, '" +
         userID +
         "', '" +
         addressID +
@@ -248,6 +249,8 @@ class OrderController {
         totalCost +
         "', '" +
         status +
+        "', '" +
+        payment +
         "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;

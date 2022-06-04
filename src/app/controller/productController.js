@@ -21,10 +21,8 @@ const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
   "Product.discount, " +
   "Unit.name as unit, " +
   'GROUP_CONCAT(CONCAT(ProductImage.id," "), CONCAT(ProductImage.image_path)) as images, ' +
-  "CONVERT(IF (SUM(WishList.id) IS null, 0, 1), UNSIGNED) AS liked, " +
   "CONVERT(IF (SUM(OrderItems.quantity) IS null, 0, SUM(OrderItems.quantity)), UNSIGNED) AS sold " +
   "FROM Product " +
-  "LEFT JOIN WishList ON WishList.product_id = Product.id " +
   "LEFT JOIN OrderItems ON OrderItems.product_id = Product.id " +
   "JOIN Category ON Product.category_id = Category.id " +
   "JOIN ProductImage ON ProductImage.product_id = Product.id " +
@@ -56,11 +54,9 @@ const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
   "Product.discount, " +
   "Unit.name as unit, " +
   'GROUP_CONCAT(CONCAT(ProductImage.id," "), CONCAT(ProductImage.image_path)) as images, ' +
-  "CONVERT(IF (SUM(WishList.id) IS null, 0, 1), UNSIGNED) AS liked, " +
   "CONVERT(IF (SUM(OrderItems.quantity) IS null, 0, SUM(OrderItems.quantity)), UNSIGNED) AS sold, " +
   "GROUP_CONCAT(DISTINCT BannerDetail.banner_id) as bannerID "  +
   "FROM Product " +
-  "LEFT JOIN WishList ON WishList.product_id = Product.id " +
   "LEFT JOIN OrderItems ON OrderItems.product_id = Product.id " +
   "JOIN Category ON Product.category_id = Category.id " +
   "JOIN ProductImage ON ProductImage.product_id = Product.id " +
@@ -99,10 +95,8 @@ const SEARCH_TO_DETAIL_PRODUCTS = ({ value, filter, sort, page }) =>
   "Product.discount, " +
   "Unit.name as unit, " +
   'GROUP_CONCAT(CONCAT(ProductImage.id," "), CONCAT(ProductImage.image_path)) as images, ' +
-  "CONVERT(IF (SUM(WishList.id) IS null, 0, 1), UNSIGNED) AS liked, " +
   "CONVERT(IF (SUM(OrderItems.quantity) IS null, 0, SUM(OrderItems.quantity)), UNSIGNED) AS sold " +
   "FROM Product " +
-  "LEFT JOIN WishList ON WishList.product_id = Product.id " +
   "LEFT JOIN OrderItems ON OrderItems.product_id = Product.id " +
   "JOIN Category ON Product.category_id = Category.id " +
   "JOIN ProductImage ON ProductImage.product_id = Product.id " +

@@ -4,6 +4,7 @@ const { orderController } = require("../app/controller/index");
 
 router.post("/add", orderController.addOrder);
 router.post("/item/add", orderController.addOrderItem);
+router.post("/item/user/:id", orderController.addOrderItemsByLastOrderIDWithUserID);
 router.patch("/update/:id", orderController.updateOrderByIDRequest);
 router.patch("/item/update/:id", orderController.updateOrderItemsByIDRequest);
 router.delete("/:id", orderController.deleteOrderByIDRequest);

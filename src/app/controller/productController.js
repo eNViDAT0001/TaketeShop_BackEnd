@@ -30,10 +30,10 @@ const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
   (field ? `WHERE result.${field}` + "=" + `'${value}'` : "") +
   " " +
   "GROUP by result.id " +
-  (filter ? `ORDER BY result.${filter} ` : "ORDER BY result.id ") +
-  (sort ? sort : "ASC") +
+  (filter ? `ORDER BY result.${filter} ` : "ORDER BY result.update_time ") +
+  (sort ? sort : "DESC") +
   " " +
-  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
+  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "LIMIT 10 OFFSET 0");
 
   const GET_ALL_PRODUCT_DETAIL_BY_BANNER_ID = (bannerID) =>
   "SELECT " +
@@ -62,19 +62,17 @@ const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
   "JOIN ProductImage ON ProductImage.product_id = Product.id " +
   "JOIN BannerDetail ON BannerDetail.product_id = Product.id "+
   "JOIN Unit ON Product.unit_id = Unit.id GROUP by ProductImage.product_id) result " +
-  `WHERE result.bannerID =` + bannerID +
-  " "+
+  `WHERE result.bannerID = ${bannerID} ` +
   "GROUP by result.id " +
-   "ORDER BY result.id " +
-   "ASC" ;
+   "ORDER BY result.update_time DESC";
 
 const GET_RAW_PRODUCT = ({ field, value, filter, sort, page }) =>
   "SELECT * FROM Product " +
   (field ? `WHERE Product.${field}` + "=" + `'${value}' ` : " ") +
   (filter ? `ORDER BY Product.${filter} ` : "ORDER BY Product.id ") +
-  (sort ? sort : "ASC") +
+  (sort ? sort : "DESC") +
   " " +
-  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
+  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "LIMIT 10 OFFSET 0");
 
 const SEARCH_TO_DETAIL_PRODUCTS = ({ value, filter, sort, page }) =>
   "SELECT " +
@@ -106,10 +104,10 @@ const SEARCH_TO_DETAIL_PRODUCTS = ({ value, filter, sort, page }) =>
     " WITH QUERY EXPANSION) ") +
   " GROUP by ProductImage.product_id) result " +
   "GROUP by result.id " +
-  (filter ? `ORDER BY result.${filter} ` : "ORDER BY result.id ") +
-  (sort ? sort : "ASC") +
+  (filter ? `ORDER BY result.${filter} ` : "ORDER BY result.update_time ") +
+  (sort ? sort : "DESC") +
   " " +
-  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
+  (page ? `LIMIT (${(page + 1) * 10} - 1) OFFSET ${page * 10}` : "LIMIT 10 OFFSET 0");
 class ProductController {
   index(req, res, next) {
     res.send("Product controller....");
@@ -202,7 +200,7 @@ class ProductController {
         sort: req.query.sort,
         page: +req.query.page,
       });
-
+      console.log(command)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);

@@ -159,7 +159,7 @@ class AddressController {
 
   async getAllProvince(req, res) {
     try {
-      let command = "SELECT * FROM Province"
+      let command = "SELECT * FROM Province ORDER BY Province.name DESC"
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);
@@ -183,7 +183,7 @@ class AddressController {
   }
   async getAllDistrictWithProvinceID(req, res) {
     try {
-      let command = `SELECT District.* FROM District INNER JOIN Province ON Province.id = District.province_id WHERE District.province_id = '${req.query.province}'`
+      let command = `SELECT District.* FROM District INNER JOIN Province ON Province.id = District.province_id WHERE District.province_id = '${req.query.province}' ORDER BY District.name DESC`
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);
@@ -195,7 +195,7 @@ class AddressController {
   }
   async getAllWardWithProvinceIDAndDistrictID(req, res) {
     try {
-      let command = `SELECT Ward.* FROM Ward INNER JOIN Province ON Province.id = Ward.province_id INNER JOIN District ON District.id = Ward.district_id WHERE Ward.province_id = '${req.query.province}' AND Ward.district_id = '${req.query.district}'`;
+      let command = `SELECT Ward.* FROM Ward INNER JOIN Province ON Province.id = Ward.province_id INNER JOIN District ON District.id = Ward.district_id WHERE Ward.province_id = '${req.query.province}' AND Ward.district_id = '${req.query.district}' ORDER BY Ward.name DESC`;
       console.log(command)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;

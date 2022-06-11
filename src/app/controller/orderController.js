@@ -52,7 +52,62 @@ class OrderController {
       });
     }
   }
+  async addOrderItemsByLastOrderIDWithUserID(req, res) {
+    const userID = req.params.id;
+    try {
+      var command =
+        "SELECT `Order`.id FROM `Order` WHERE `Order`.user_id = '" +
+        userID +
+        "' ORDER BY `Order`.create_time DESC";
+      //////////////addressController.js
+      SQLpool.getConnection((err, connection) => {
+        if (err) throw err;
+        const id = connection.query(command, (error, result) => {
+          if (error) throw error;
+          return result[0];
+        });
+        const items = req.body.items;
+        items.forEach((item) => {
+          command =
+            "INSERT INTO `OrderItems` (`id`, `order_id`, `category_id`, `product_id`, `name`, `price`, `quantity`, `discount`, `image`, `create_time`, `update_time`) VALUES (NULL, '" +
+            id +
+            "', '" +
+            item.categoryID +
+            "', '" +
+            item.productID +
+            "', '" +
+            item.name +
+            "', '" +
+            item.price +
+            "', '" +
+            item.quantity +
+            "', '" +
+            item.discount +
+            "', '" +
+            item.images[0] +
+            "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+          connection.query(command, (error, result) => {
+            if (error) throw error;
+            console.log(`Add ${item.name} to Order(${id}) success`);
+          });
+        });
 
+        command = "DELETE FROM CartItem WHERE `CartItem`.`user_id` = " + userID;
+        connection.query(command, (error, result) => {
+          if (error) throw error;
+        });
+
+        connection.release();
+      });
+      //////////////////////
+    } catch (err) {
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
   async getOrderWithUserID(req, res) {
     try {
       var command = "SELECT * FROM `Order` WHERE user_id =" + req.params.id;
@@ -89,7 +144,6 @@ class OrderController {
       });
     }
   }
-
   async updateOrderByIDRequest(req, res) {
     const {
       userID,
@@ -173,7 +227,6 @@ class OrderController {
     }
   }
   async deleteOrderByIDRequest(req, res) {
-
     try {
       var command = "DELETE FROM Order WHERE `Order`.`id` = " + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
@@ -189,7 +242,6 @@ class OrderController {
       });
     }
   }
-
   async deleteOrderItemByIDRequest(req, res) {
     const { OrderItemID } = req.body;
 
@@ -209,53 +261,106 @@ class OrderController {
       });
     }
   }
-
   async addOrder(req, res) {
     try {
       var {
         userID,
-        addressID,
         name,
         gender,
         phone,
         province,
         district,
+        street,
         ward,
         quantity,
         totalCost,
-        status,
-        payment
+        payment,
+        paid,
+        items,
       } = req.body;
-      var command =
-        "INSERT INTO `Order` (`id`, `user_id`, `address_id`, `name`, `gender`, `phone`, `province`, `district`, `ward`, `quantity`, `total_cost`, `status`, `payment`, `create_time`, `update_time`) VALUES (NULL, '" +
-        userID +
-        "', '" +
-        addressID +
-        "', '" +
-        name +
-        "', '" +
-        gender +
-        "', '" +
-        phone +
-        "', '" +
-        province +
-        "', '" +
-        district +
-        "', '" +
-        ward +
-        "', '" +
-        quantity +
-        "', '" +
-        totalCost +
-        "', '" +
-        status +
-        "', '" +
-        payment +
-        "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-      SQLpool.execute(command, (err, result, field) => {
+
+      SQLpool.getConnection((err, connection) => {
         if (err) throw err;
-        console.log("Add Order Success");
+        //Insert Order to MySQL
+        var command =
+          "INSERT INTO `Order` (`id`, `user_id`, `name`, `gender`, `phone`, `province`, `district`, `street`, `ward`, `quantity`, `total_cost`, `payment`, `paid`, `create_time`, `update_time`) VALUES (NULL, '" +
+          userID +
+          "', '" +
+          name +
+          "', '" +
+          gender +
+          "', '" +
+          phone +
+          "', '" +
+          province +
+          "', '" +
+          district +
+          "', '" +
+          street +
+          "', '" +
+          ward +
+          "', '" +
+          quantity +
+          "', '" +
+          totalCost +
+          "', '" +
+          payment +
+          "', '" +
+          paid +
+          "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+        connection.query(command, (error, result) => {
+          if (error) throw error;
+        });
+
+        //Get lastest Order
+        command =
+          "SELECT `Order`.* FROM `Order` WHERE `Order`.user_id = '" +
+          userID +
+          "' ORDER BY `Order`.create_time DESC";
+        let id;
+        connection.query(command, (error, result) => {
+          if (error) throw error;
+          id = result[0].id;
+
+          //insert Order Items using req.body.items
+          items.forEach((item) => {
+            command =
+              "INSERT INTO `OrderItems` (`id`, `order_id`, `category_id`, `product_id`, `name`, `price`, `quantity`, `discount`, `image`, `create_time`, `update_time`) VALUES (NULL, '" +
+              id +
+              "', '" +
+              item.categoryID +
+              "', '" +
+              item.productID +
+              "', '" +
+              item.name +
+              "', '" +
+              item.price +
+              "', '" +
+              item.quantity +
+              "', '" +
+              item.discount +
+              "', '" +
+              item.images[0].image +
+              "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+            connection.query(command, (error, result) => {
+              if (error) throw error;
+              console.log(`Add ${item.name} to Order(${id}) success`);
+            });
+
+            command =
+            "DELETE FROM CartItem WHERE `CartItem`.`id` = " + item.id;
+          connection.query(command, (error, result) => {
+            if (error) throw error;
+            console.log("Delete selected Cart Items success")
+          });
+          });
+
+          
+        });
+
+        connection.release();
       });
+
     } catch (err) {
       console.log(err);
       res.send({

@@ -41,7 +41,6 @@ const GET_ALL_BANNER_DETAIL = (field, value) =>
         var command = GET_ALL_BANNER_DETAIL("id", req.params.id);
         SQLpool.execute(command, (err, result, field) => {
           if (err) throw err;
-          console.log(result.length);
           res.send(result);
         });
       } catch (err) {

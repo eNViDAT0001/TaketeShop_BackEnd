@@ -1,5 +1,37 @@
 const { setConvertSQL } = require("../../ulti/ulti");
 const SQLpool = require("../../database/connectSQL");
+const ORDER_STATUS = {
+  WAITING: 0,
+  CONFIRMED: 1,
+  DELIVERING: 2,
+  DELIVERED: 2,
+  CANCEL: 3,
+};
+const statusConvert = (type) => {
+  switch (type) {
+    case ORDER_STATUS.WAITING:
+      return `status = 'WAITING'`;
+    case ORDER_STATUS.CONFIRMED:
+      return `status = 'CONFIRMED'`;
+    case ORDER_STATUS.DELIVERING:
+      return `status = 'DELIVERING'`;
+    case ORDER_STATUS.DELIVERED:
+      return `status = 'DELIVERED'`;
+    case ORDER_STATUS.CANCEL:
+      return `status = 'CANCEL'`;
+    default:
+      return null;
+  }
+};
+
+const ORDER_QUERY = ({ id, status, page }) => {
+  const userID = id ? `user_id = '${id}' ` : ``;
+  const paging = page
+    ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}`
+    : "LIMIT 10 OFFSET 0";
+  const queryStatus = status? `AND ${statusConvert(status)}` : '';
+  return `SELECT * FROM Orders WHERE ${userID} ${queryStatus} ${paging}`;
+};
 class OrderController {
   index(req, res, next) {
     res.send("Order controller....");
@@ -7,10 +39,25 @@ class OrderController {
 
   async getAllOrder(req, res) {
     try {
-      var command = "SELECT * FROM `Order`";
+      var command = `SELECT * FROM Orders`;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
+      });
+    } catch (err) {
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
+  async getOrderByOrderID(req, res) {
+    try {
+      var command = `SELECT * FROM Orders WHERE Orders.id =` + req.params.id;
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        res.send(result[0]);
       });
     } catch (err) {
       console.log(err);
@@ -52,65 +99,30 @@ class OrderController {
       });
     }
   }
-  async addOrderItemsByLastOrderIDWithUserID(req, res) {
-    const userID = req.params.id;
+  async getOrderWithUserID(req, res) {
     try {
-      var command =
-        "SELECT `Order`.id FROM `Order` WHERE `Order`.user_id = '" +
-        userID +
-        "' ORDER BY `Order`.create_time DESC";
-      //////////////addressController.js
-      SQLpool.getConnection((err, connection) => {
-        if (err) throw err;
-        const id = connection.query(command, (error, result) => {
-          if (error) throw error;
-          return result[0];
-        });
-        const items = req.body.items;
-        items.forEach((item) => {
-          command =
-            "INSERT INTO `OrderItems` (`id`, `order_id`, `category_id`, `product_id`, `name`, `price`, `quantity`, `discount`, `image`, `create_time`, `update_time`) VALUES (NULL, '" +
-            id +
-            "', '" +
-            item.categoryID +
-            "', '" +
-            item.productID +
-            "', '" +
-            item.name +
-            "', '" +
-            item.price +
-            "', '" +
-            item.quantity +
-            "', '" +
-            item.discount +
-            "', '" +
-            item.images[0] +
-            "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
-          connection.query(command, (error, result) => {
-            if (error) throw error;
-            console.log(`Add ${item.name} to Order(${id}) success`);
-          });
-        });
-
-        command = "DELETE FROM CartItem WHERE `CartItem`.`user_id` = " + userID;
-        connection.query(command, (error, result) => {
-          if (error) throw error;
-        });
-
-        connection.release();
+      var command = ORDER_QUERY({
+        id: req.params.id,
+        status: req.query.status,
+        page: req.query.page,
       });
-      //////////////////////
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        res.send(result);
+      });
     } catch (err) {
-      console.log(err);
       res.send({
         error: true,
         msg: err,
       });
     }
   }
-  async getOrderWithUserID(req, res) {
+  async getOrderWithStatus(req, res) {
     try {
-      var command = "SELECT * FROM `Order` WHERE user_id =" + req.params.id;
+      var command = ORDER_QUERY({
+        status: req.query.status,
+        page: req.query.page,
+      });
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -129,7 +141,7 @@ class OrderController {
         "`OrderItems`.* " +
         "FROM " +
         "`OrderItems` " +
-        "JOIN `Order` ON `OrderItems`.`order_id` = `Order`.`id` " +
+        "JOIN `Orders`ON `OrderItems`.`order_id` = `Order`.`id` " +
         "JOIN `User` ON `Order`.`user_id` = `User`.`id` " +
         "WHERE User.id = " +
         req.params.id;
@@ -157,6 +169,8 @@ class OrderController {
       quantity,
       totalCost,
       status,
+      payment,
+      paid,
     } = req.body;
     const OrderID = req.params.id;
     const setUserID = setConvertSQL(userID, "user_id");
@@ -169,12 +183,14 @@ class OrderController {
     const setWard = setConvertSQL(ward, "ward");
     const setQuantity = setConvertSQL(quantity, "quantity");
     const setTotalCost = setConvertSQL(totalCost, "total_cost");
-    const setStatus = setConvertSQL(status, "status");
+    const setStatus = status ? `${statusConvert(status)}, `: "";
+    const setPayment = setConvertSQL(payment, "payment");
+    const setPaid = setConvertSQL(paid, "paid");
 
     try {
       var command =
-        "UPDATE `Order` SET " +
-        `${setUserID}${setAddressID}${setName}${setGender}${setPhone}${setProvince}${setDistrict}${setWard}${setQuantity}${setTotalCost}${setStatus}` +
+        "UPDATE `Orders`SET " +
+        `${setUserID}${setAddressID}${setName}${setGender}${setPhone}${setProvince}${setDistrict}${setWard}${setQuantity}${setTotalCost}${setStatus}${setPayment}${setPaid}` +
         " update_time = CURRENT_TIMESTAMP WHERE id = " +
         OrderID;
       SQLpool.execute(command, (err, result, field) => {
@@ -244,7 +260,6 @@ class OrderController {
   }
   async deleteOrderItemByIDRequest(req, res) {
     const { OrderItemID } = req.body;
-
     try {
       var command =
         "DELETE FROM Order WHERE `OrderItems`.`id` = " + OrderItemID;
@@ -283,7 +298,7 @@ class OrderController {
         if (err) throw err;
         //Insert Order to MySQL
         var command =
-          "INSERT INTO `Order` (`id`, `user_id`, `name`, `gender`, `phone`, `province`, `district`, `street`, `ward`, `quantity`, `total_cost`, `payment`, `paid`, `create_time`, `update_time`) VALUES (NULL, '" +
+          "INSERT INTO `Orders`(`id`, `user_id`, `name`, `gender`, `phone`, `province`, `district`, `street`, `ward`, `quantity`, `total_cost`, `payment`, `paid`, `create_time`, `update_time`) VALUES (NULL, '" +
           userID +
           "', '" +
           name +
@@ -314,7 +329,7 @@ class OrderController {
 
         //Get lastest Order
         command =
-          "SELECT `Order`.* FROM `Order` WHERE `Order`.user_id = '" +
+          "SELECT `Order`.* FROM `Orders`WHERE `Order`.user_id = '" +
           userID +
           "' ORDER BY `Order`.create_time DESC";
         let id;
@@ -347,20 +362,16 @@ class OrderController {
               console.log(`Add ${item.name} to Order(${id}) success`);
             });
 
-            command =
-            "DELETE FROM CartItem WHERE `CartItem`.`id` = " + item.id;
-          connection.query(command, (error, result) => {
-            if (error) throw error;
-            console.log("Delete selected Cart Items success")
+            command = "DELETE FROM CartItem WHERE `CartItem`.`id` = " + item.id;
+            connection.query(command, (error, result) => {
+              if (error) throw error;
+              console.log("Delete selected Cart Items success");
+            });
           });
-          });
-
-          
         });
 
         connection.release();
       });
-
     } catch (err) {
       console.log(err);
       res.send({

@@ -62,7 +62,7 @@ class AddressController {
       var command = "DELETE FROM Address WHERE `Address`.`id` = " + id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result);
+        //console.log(result);
       });
     } catch (err) {
       console.log(err);
@@ -142,7 +142,7 @@ class AddressController {
         addressID;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result);
+        //console.log(result);
         res.send({
           error: false,
           msg: "Update Success",
@@ -162,7 +162,7 @@ class AddressController {
       let command = "SELECT * FROM Province ORDER BY Province.name DESC"
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result);
+        //console.log(result);
         res.send(result);
       });
     } catch (error) {
@@ -174,7 +174,7 @@ class AddressController {
       let command = "SELECT * FROM Province WHERE Province.id" + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
-        console.log(result);
+        //console.log(result);
         res.send(result);
       });
     } catch (error) {
@@ -196,7 +196,6 @@ class AddressController {
   async getAllWardWithProvinceIDAndDistrictID(req, res) {
     try {
       let command = `SELECT Ward.* FROM Ward INNER JOIN Province ON Province.id = Ward.province_id INNER JOIN District ON District.id = Ward.district_id WHERE Ward.province_id = '${req.query.province}' AND Ward.district_id = '${req.query.district}' ORDER BY Ward.name DESC`;
-      console.log(command)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         // console.log(result);

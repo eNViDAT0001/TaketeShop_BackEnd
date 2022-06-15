@@ -1,14 +1,14 @@
 const { setConvertSQL } = require("../../ulti/ulti");
 const SQLpool = require("../../database/connectSQL");
 const ORDER_STATUS = {
-  WAITING: 0,
-  CONFIRMED: 1,
-  DELIVERING: 2,
-  DELIVERED: 2,
-  CANCEL: 3,
+  WAITING: 1,
+  CONFIRMED: 2,
+  DELIVERING: 3,
+  DELIVERED: 4,
+  CANCEL: 5,
 };
 const statusConvert = (type) => {
-  switch (type) {
+  switch (+type) {
     case ORDER_STATUS.WAITING:
       return `status = 'WAITING'`;
     case ORDER_STATUS.CONFIRMED:
@@ -20,7 +20,7 @@ const statusConvert = (type) => {
     case ORDER_STATUS.CANCEL:
       return `status = 'CANCEL'`;
     default:
-      return null;
+      return '';
   }
 };
 
@@ -29,8 +29,9 @@ const ORDER_QUERY = ({ id, status, page }) => {
   const paging = page
     ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}`
     : "LIMIT 10 OFFSET 0";
+    console.log(statusConvert(status))
   const queryStatus = status? `AND ${statusConvert(status)}` : '';
-  return `SELECT * FROM Orders WHERE ${userID} ${queryStatus} ${paging}`;
+  return `SELECT * FROM Orders WHERE ${userID}${queryStatus} ${paging}`;
 };
 class OrderController {
   index(req, res, next) {
@@ -87,6 +88,7 @@ class OrderController {
       var command =
         "SELECT * FROM `OrderItems` WHERE OrderItems.order_id = " +
         req.params.id;
+        console.log(command)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -106,6 +108,7 @@ class OrderController {
         status: req.query.status,
         page: req.query.page,
       });
+      console.log(command)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);
@@ -145,6 +148,7 @@ class OrderController {
         "JOIN `User` ON `Order`.`user_id` = `User`.`id` " +
         "WHERE User.id = " +
         req.params.id;
+        console.log(command);
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);

@@ -92,7 +92,8 @@ class CartController {
         productID +
         "', '" +
         quantity +
-        "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+        "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE `quantity` = `quantity` + " +
+        quantity;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log("Add Cart Success");

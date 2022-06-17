@@ -33,6 +33,14 @@ const ORDER_QUERY = ({ id, status, page }) => {
   const queryStatus = status? `AND ${statusConvert(status)}` : '';
   return `SELECT * FROM Orders WHERE ${userID}${queryStatus} ${paging}`;
 };
+const ORDER_QUERY_STATUS = ({ status, page }) => {
+  const paging = page
+    ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}`
+    : "LIMIT 10 OFFSET 0";
+    console.log(statusConvert(status))
+  const queryStatus = status? `${statusConvert(status)}` : '';
+  return `SELECT * FROM Orders WHERE ${queryStatus} ${paging}`;
+};
 class OrderController {
   index(req, res, next) {
     res.send("Order controller....");
@@ -122,10 +130,11 @@ class OrderController {
   }
   async getOrderWithStatus(req, res) {
     try {
-      var command = ORDER_QUERY({
+      var command = ORDER_QUERY_STATUS({
         status: req.query.status,
         page: req.query.page,
       });
+      console.log(command)
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         res.send(result);

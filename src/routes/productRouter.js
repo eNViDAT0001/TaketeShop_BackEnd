@@ -10,6 +10,7 @@ router.get("/productList/banner/:id", productController.getProductWithBannerID);
 router.get("/all", productController.getAllProductWithPagination);
 router.get("/raw", productController.getRawProductWithPagination);
 router.get("/search", productController.searchProductWithPagination);
+router.get("/unit", productController.searchProductWithPagination);
 router.get("/:id", productController.getProductByID);
 router.get("/", productController.index);
 

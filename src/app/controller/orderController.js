@@ -153,8 +153,8 @@ class OrderController {
         "`OrderItems`.* " +
         "FROM " +
         "`OrderItems` " +
-        "JOIN `Orders`ON `OrderItems`.`order_id` = `Order`.`id` " +
-        "JOIN `User` ON `Order`.`user_id` = `User`.`id` " +
+        "JOIN `Orders`ON `OrderItems`.`order_id` = `Orders`.`id` " +
+        "JOIN `User` ON `Orders`.`user_id` = `User`.`id` " +
         "WHERE User.id = " +
         req.params.id;
         console.log(command);
@@ -257,7 +257,7 @@ class OrderController {
   }
   async deleteOrderByIDRequest(req, res) {
     try {
-      var command = "DELETE FROM Order WHERE `Order`.`id` = " + req.params.id;
+      var command = "DELETE FROM Order WHERE `Orders`.`id` = " + req.params.id;
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log(result);
@@ -342,9 +342,9 @@ class OrderController {
 
         //Get lastest Order
         command =
-          "SELECT `Order`.* FROM `Orders`WHERE `Order`.user_id = '" +
+          "SELECT `Orders`.* FROM `Orders`WHERE `Orders`.user_id = '" +
           userID +
-          "' ORDER BY `Order`.create_time DESC";
+          "' ORDER BY `Orders`.create_time DESC";
         let id;
         connection.query(command, (error, result) => {
           if (error) throw error;

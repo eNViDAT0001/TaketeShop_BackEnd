@@ -33,7 +33,7 @@ const GET_ALL_PRODUCT_DETAIL = ({ field, value, filter, sort, page }) =>
   (filter ? `ORDER BY result.${filter} ` : "ORDER BY result.update_time ") +
   (sort ? sort : "DESC") +
   " " +
-  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "LIMIT 10 OFFSET 0");
+  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
 
   const GET_ALL_PRODUCT_DETAIL_BY_BANNER_ID = (bannerID) =>
   "SELECT " +
@@ -72,7 +72,7 @@ const GET_RAW_PRODUCT = ({ field, value, filter, sort, page }) =>
   (filter ? `ORDER BY Product.${filter} ` : "ORDER BY Product.id ") +
   (sort ? sort : "DESC") +
   " " +
-  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "LIMIT 10 OFFSET 0");
+  (page ? `LIMIT ${(page + 1) * 10} OFFSET ${page * 10}` : "");
 
 const SEARCH_TO_DETAIL_PRODUCTS = ({ value, filter, sort, page }) =>
   "SELECT " +
@@ -107,7 +107,7 @@ const SEARCH_TO_DETAIL_PRODUCTS = ({ value, filter, sort, page }) =>
   (filter ? `ORDER BY result.${filter} ` : "ORDER BY result.update_time ") +
   (sort ? sort : "DESC") +
   " " +
-  (page ? `LIMIT (${(page + 1) * 10} - 1) OFFSET ${page * 10}` : "LIMIT 10 OFFSET 0");
+  (page ? `LIMIT (${(page + 1) * 10} - 1) OFFSET ${page * 10}` : "");
 class ProductController {
   index(req, res, next) {
     res.send("Product controller....");
@@ -155,6 +155,22 @@ class ProductController {
         sort: req.query.sort,
         page: +req.query.page,
       });
+
+      SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        res.send(result);
+      });
+    } catch (err) {
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
+  async getAllUnit(req, res) {
+    try {
+      var command = "Select * from Unit"
 
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;

@@ -1,4 +1,5 @@
-GET http://localhost:5000/product/productlist?value=12
+
+GET http://localhost:5000/product/all
 
 
 

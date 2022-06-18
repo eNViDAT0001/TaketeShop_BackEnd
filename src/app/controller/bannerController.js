@@ -11,7 +11,7 @@ const GET_ALL_BANNER_DETAIL = (field, value) =>
   "GROUP_CONCAT(Product.id) as productID, " +
   "Banner.create_time, Banner.update_time " +
   "FROM `Banner` " +
-  "LEFT JOIN `BannerDetail` ON `BannerDetail`.`banner_id` = `Banner`.`id` " +
+  "INNER JOIN `BannerDetail` ON `BannerDetail`.`banner_id` = `Banner`.`id` " +
   "LEFT JOIN `Product` ON `BannerDetail`.`product_id` = `Product`.`id` " +
   (field ? `WHERE Banner.${field}` + "=" + `'${value}' ` : "") +
   "GROUP BY Banner.id"
@@ -41,7 +41,6 @@ const GET_ALL_BANNER_DETAIL = (field, value) =>
         var command = GET_ALL_BANNER_DETAIL("id", req.params.id);
         SQLpool.execute(command, (err, result, field) => {
           if (err) throw err;
-          console.log(result.length);
           res.send(result);
         });
       } catch (err) {

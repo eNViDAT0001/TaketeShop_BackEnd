@@ -273,19 +273,6 @@ class UserController {
       });
     }
   }
-
-  // async getAllUser(req, res) {
-  //   try {
-  //     var command = "SELECT * FROM `User`";
-  //     SQLpool.execute(command, (err, result, field) => {
-  //       if (err) throw err;
-  //       console.log(result);
-  //       res.send(result);
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // }
   async getAllStaff(req, res) {
     try {
       var command = "SELECT * FROM `User` WHERE type = 'STAFF'";

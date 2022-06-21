@@ -1,5 +1,13 @@
 const { setConvertSQL } = require("../../ulti/ulti");
 const SQLpool = require("../../database/connectSQL");
+var recombee = require('recombee-api-client');
+var rqs = recombee.requests;
+
+var client = new recombee.ApiClient(
+  'uit-dev', 
+  'RmrOMvTYVGcVnqVBWKJv5tpVzmI0U3fS5apNfYre2yq2BCE1dt9B7HNRUk10Kkn4', 
+  { region: 'ap-se' }
+);
 const ORDER_STATUS = {
   WAITING: 1,
   CONFIRMED: 2,
@@ -310,6 +318,7 @@ class OrderController {
       SQLpool.getConnection((err, connection) => {
         if (err) throw err;
         //Insert Order to MySQL
+        var request;
         var command =
           "INSERT INTO `Orders`(`id`, `user_id`, `name`, `gender`, `phone`, `province`, `district`, `street`, `ward`, `quantity`, `total_cost`, `payment`, `paid`, `create_time`, `update_time`) VALUES (NULL, '" +
           userID +
@@ -380,6 +389,9 @@ class OrderController {
               if (error) throw error;
               console.log("Delete selected Cart Items success");
             });
+            client.send(new rqs.AddPurchase(`user-${userID}`,`item-${item.id}`, {cascadeCreate: true}), (err, responses) => {
+              console.log(responses);
+          });
           });
         });
 

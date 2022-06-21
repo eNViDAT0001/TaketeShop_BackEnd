@@ -13,7 +13,7 @@ router.get("/all", productController.getAllProductWithPagination);
 router.get("/recommender/:id", productController.getRecommenderProductWithUserID);
 router.get("/raw", productController.getRawProductWithPagination);
 router.get("/search", productController.searchProductWithPagination);
-router.get("/unit", productController.searchProductWithPagination);
+router.get("/unit", productController.getAllUnit);
 router.get("/:id", productController.getProductByID);
 router.get("/", productController.index);
 

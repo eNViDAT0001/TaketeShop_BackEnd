@@ -375,7 +375,7 @@ class OrderController {
               "', '" +
               item.quantity +
               "', '" +
-              item.discount +
+              (item.discount? item.discount : 0) +
               "', '" +
               item.images[0].image +
               "', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";

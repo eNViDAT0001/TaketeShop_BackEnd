@@ -10,3 +10,5 @@ router.patch("/:id", discountController.updateDiscountByIDRequest);
 router.get("/", discountController.index);
 
 module.exports = router;
+
+

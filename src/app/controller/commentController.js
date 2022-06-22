@@ -1,6 +1,14 @@
 const SQLpool = require("../../database/connectSQL");
 const { setConvertSQL } = require("../../ulti/ulti");
+var recombee = require("recombee-api-client");
+var rqs = recombee.requests;
 
+var client = new recombee.ApiClient(
+  "uit-dev",
+  "RmrOMvTYVGcVnqVBWKJv5tpVzmI0U3fS5apNfYre2yq2BCE1dt9B7HNRUk10Kkn4",
+  { region: "ap-se" }
+);
+const NUM = 100;
 const GET_ALL_COMMENT_DETAIL = (field, value) =>
   "SELECT " +
   "`Comment`.`id`, " +
@@ -127,7 +135,61 @@ class CommentController {
       SQLpool.execute(command, (err, result, field) => {
         if (err) throw err;
         console.log("Add Comment Success");
+
+        client.send(
+          new rqs.AddRating(
+            `user-${userID}`,
+            `item-${productID}`,
+            (rating * 1.0) / 5,
+            {
+              cascadeCreate: true,
+            }
+          )
+        );
       });
+    } catch (err) {
+      console.log(err);
+      res.send({
+        error: true,
+        msg: err,
+      });
+    }
+  }
+  async fakeRecommenderComentData(req, res, next) {
+    try {
+      var command = "SELECT * FROM User";
+      let user = [];
+      let product = [];
+
+      await SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        user = result;
+      });
+      command = "Select * from Product";
+      await SQLpool.execute(command, (err, result, field) => {
+        if (err) throw err;
+        product = result;
+      });
+      
+      const requests = [];
+      const fakeRequest = () => {
+        for (let i = 0; i < 1000; i++) {
+          const userID = user.sort(() => 0.5 - Math.random()).slice(0, 1);
+          const productID = product.sort(() => 0.5 - Math.random()).slice(0, 1);
+          requests.push(
+            new rqs.AddRating(
+              `user-${userID}`,
+              `item-${productID}`,
+              Math.random(),
+              {
+                cascadeCreate: true,
+              }
+            )
+          );
+        }
+      };
+      await fakeRequest();
+      client.send(new rqs.Batch(requests));
     } catch (err) {
       console.log(err);
       res.send({

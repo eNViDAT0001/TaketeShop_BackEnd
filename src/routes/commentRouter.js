@@ -8,6 +8,7 @@ router.delete("/:id", commentController.deleteCommentByIDRequest);
 router.get("/product/:id", commentController.getCommentWithProductID);
 router.get("/user/:id", commentController.getCommentWithUserID);
 router.get("/all", commentController.getAllComment);
+router.get("/fakeRecommender", commentController.fakeRecommenderComentData);
 router.get("/", commentController.index);
 
 

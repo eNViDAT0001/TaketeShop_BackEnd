@@ -1,6 +1,1 @@
-
-GET http://localhost:5000/product/all
-
-
-
-//
+http://localhost:5000/product/recommender/10

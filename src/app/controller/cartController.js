@@ -1,5 +1,13 @@
 const SQLpool = require("../../database/connectSQL");
 const { setConvertSQL } = require("../../ulti/ulti");
+var recombee = require("recombee-api-client");
+var rqs = recombee.requests;
+
+var client = new recombee.ApiClient(
+  "uit-dev",
+  "RmrOMvTYVGcVnqVBWKJv5tpVzmI0U3fS5apNfYre2yq2BCE1dt9B7HNRUk10Kkn4",
+  { region: "ap-se" }
+);
 const GET_ALL_CART_ITEMS_WITH_USER_ID = (id) =>
   "SELECT " +
   "CartItem.id, " +
@@ -99,6 +107,15 @@ class CartController {
         console.log("Add Cart Success");
         res.send(result);
       });
+      client.send(
+        new rqs.AddCartAddition(
+          `user-${userID}`,
+          `item-${productID}`,
+          {
+            cascadeCreate: true,
+          }
+        )
+      );
     } catch (err) {
       console.log(err);
       res.send({
